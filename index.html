@@ -31,7 +31,8 @@ h1{font-size:clamp(31px,5vw,48px);line-height:1;letter-spacing:-.056em}
 .briefing{display:flex;align-items:center;gap:16px;justify-content:space-between;margin-bottom:13px;padding:12px 15px;border:1px solid #755638;border-radius:9px;background:#211d19}
 .briefing h2{color:var(--amber);font:700 12px var(--mono)}.briefing p{max-width:76ch;margin-top:5px;font-size:15px;line-height:1.4}
 .briefing .btn{width:auto;flex-shrink:0}
-.desk{display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.75fr) minmax(0,1.24fr);gap:12px;align-items:start}
+.desk{display:grid;grid-template:"sources log work" / minmax(0,.8fr) minmax(0,1.45fr) minmax(0,1.5fr);gap:12px;align-items:start}
+.source-panel{grid-area:sources}.log-panel{grid-area:log}.outcome-panel{grid-area:work}
 .panel{border:1px solid var(--line);border-radius:10px;background:var(--panel);min-width:0;overflow:hidden}
 .panel-head{padding:12px 14px;border-bottom:1px solid var(--line)}
 .panel-head h2{font-size:17px;letter-spacing:-.02em}
@@ -53,21 +54,6 @@ h1{font-size:clamp(31px,5vw,48px);line-height:1;letter-spacing:-.056em}
 .door-demo{display:grid;gap:5px;padding:8px 10px}.door-demo label{display:flex;align-items:center;gap:6px;min-height:30px;cursor:pointer}
 .door-demo input{margin:0}.door-demo p{color:var(--mint);background:#192a23;border-radius:5px;padding:6px 8px}.door-demo p[data-denied=true]{color:var(--amber);background:#282119}
 .guide-next{margin-top:12px}.guide-next .btn{margin-top:6px}
-.map{margin:12px;position:relative;isolation:isolate;min-height:377px;display:grid;grid-template:repeat(3,1fr)/repeat(3,minmax(0,1fr));gap:6px;align-items:center;padding:15px 10px;border-radius:8px;border:1px solid #2b4241;background:radial-gradient(circle,#36534d 1px,transparent 1.4px) 0 0/17px 17px,#0d1719}
-.map::before,.map::after{content:"";position:absolute;z-index:-1;top:29%;bottom:29%;width:48%;border:1px dashed #476e61;border-radius:8px}
-.map::before{left:14%;border-right:0}.map::after{right:14%;border-left:0}
-main[data-phase="manual"] .map{min-height:245px}
-.node{display:block;text-align:left;min-width:0;width:100%;min-height:68px;padding:7px;border-radius:7px;border:1px solid #426058;color:var(--ink);background:#192625;overflow-wrap:anywhere}
-button.node:hover{border-color:var(--mint)}.node strong{display:block;font:700 11px var(--mono)}
-.node small{display:block;margin-top:6px;font-size:12px;line-height:1.28;color:var(--muted)}
-.node[data-tone=good]{background:#192a23;border-color:#4e7966}.node[data-tone=good] small{color:var(--mint)}
-.node[data-tone=warn]{background:#2c241b;border-color:#9a7446}.node[data-tone=warn] small{color:var(--amber)}
-.node[data-tone=bad]{background:#2e211f;border-color:#99645a}.node[data-tone=bad] small{color:var(--coral)}
-.node[data-pulse=true]{animation:signal .55s ease-out}
-@keyframes signal{0%{box-shadow:0 0 18px #8bdfbd85}100%{box-shadow:none}}
-.server{grid-area:1/1}.reader{grid-area:1/3}.ola{grid-area:3/1}.it{grid-area:3/3}
-.agent{grid-area:2/2;background:#26391e;border-color:#779c4f}.agent small{color:var(--lime)}
-.reception{grid-area:3/2}
 .task-card{border:1px solid var(--line);border-radius:8px;padding:9px 10px;margin-bottom:8px;background:var(--card)}
 .task-card b{display:block;font-size:15px;margin:4px 0}.task-card p{font-size:12px;color:var(--muted);line-height:1.4}
 .task-card.good{border-color:#6d9249;background:#202c1c}.task-card.good p,.task-card.good .label{color:var(--lime)}
@@ -97,9 +83,11 @@ button.node:hover{border-color:var(--mint)}.node strong{display:block;font:700 1
 .source-tip{margin:0;color:var(--muted);font-size:12px;line-height:1.45}
 fieldset{padding:7px 8px;border:1px solid var(--line);border-radius:6px;margin:0;min-width:0;font-size:13px}
 legend{padding:0 4px;color:var(--mint);font-size:12px;font-weight:700}.radios{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.radios label{display:flex;align-items:center;gap:4px}input[type=radio]{accent-color:var(--lime)}
-.log{margin-top:12px}.log-list{min-height:87px;max-height:240px;overflow:auto;padding:0 10px 9px}
-.log-row{display:grid;grid-template-columns:57px 126px minmax(0,1fr);gap:8px;padding:7px 5px;border-bottom:1px solid #273c39;font-size:13px;line-height:1.36}
-.log-row time{font:700 12px var(--mono);color:var(--mint)}.log-row b{font-weight:650}.log-row[data-tone=warn] time{color:var(--amber)}.log-row[data-tone=bad] time{color:var(--coral)}.log-row:last-child{background:#1b2b24;border-radius:4px}
+.log-list{max-height:clamp(240px,54vh,480px);overflow:auto;padding:5px 10px 9px}
+.log-list:focus-visible{outline:2px solid var(--mint);outline-offset:-2px}
+.log-row{display:grid;grid-template-columns:48px minmax(0,1fr);gap:8px;padding:9px 7px;border-bottom:1px solid #273c39;font-size:13px;line-height:1.38}
+.log-row time{font:700 12px/1.45 var(--mono);color:var(--mint)}.log-row b{display:block;margin-bottom:2px;font-weight:650}
+.log-row[data-tone=warn] time{color:var(--amber)}.log-row[data-tone=bad] time{color:var(--coral)}.log-row:last-child{background:#1b2b24;border-radius:4px}
 .report-metrics{display:grid;gap:6px;margin:8px 0}.report-metrics div{padding:7px 8px;background:#152221;border:1px solid var(--line);border-radius:6px}
 .report-metrics b{display:block;font-size:13px}.report-metrics span{font-size:12px;color:var(--muted)}
 .report-status{display:flex;justify-content:space-between;gap:8px;align-items:center}
@@ -128,14 +116,11 @@ summary{cursor:pointer;color:var(--mint);font-size:13px;font-weight:720}pre{whit
 pre mark{background:#304627;color:var(--lime);padding:1px 2px}
 .compare{display:grid;grid-template-columns:1fr 1fr;gap:7px}.compare div{min-width:0}
 .text-btn{border:0;background:transparent;color:var(--mint);text-decoration:underline;padding:6px 0;font-size:12px}
-@media(max-width:1100px){main{width:calc(100% - 30px)}.desk{grid-template-columns:minmax(0,.78fr) minmax(0,1.19fr) minmax(0,1.1fr)}.map{min-height:360px}}
-@media(max-width:850px){.desk{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr)}.outcome-panel{grid-column:2;grid-row:1/3}.map-panel{grid-column:1}.map{min-height:270px}.top{align-items:flex-start}.metrics div{min-width:83px}.metrics dd{font-size:14px}}
-@media(max-width:570px){main{width:calc(100% - 24px);padding-top:17px}.top{flex-direction:column;gap:11px;margin-bottom:14px}.brand-mark{width:41px;height:41px}.metrics{width:100%}.metrics div{flex:1;padding:7px 8px;min-width:0}.mission h2{font-size:16px}.mission p{font-size:10px}.desk{display:flex;flex-direction:column}.desk >*{width:100%}.outcome-panel{order:0}.source-panel{order:1}.map-panel{order:2}.map{min-height:245px}.log-row{grid-template-columns:43px 65px minmax(0,1fr);gap:5px;font-size:12px}.log-row time{font-size:11px}}
-@media(max-width:650px){.briefing{flex-direction:column;align-items:stretch;gap:10px}.briefing .btn{width:100%}}
-@media(min-width:851px){main[data-phase="editor"] .desk{grid-template-columns:minmax(0,.86fr) minmax(0,1.27fr) minmax(0,1.6fr)}}
-main[data-manual-report=true] .outcome-panel{grid-column:1/-1;grid-row:1}
-@media(min-width:571px){main[data-manual-report=true] .desk{grid-template-columns:minmax(0,1fr) minmax(0,2fr)}}
-@media(max-width:850px) and (min-width:571px){main[data-manual-report=true] .map-panel{grid-column:2}}
+main[data-manual-report=true] .desk{grid-template:"work work" "sources log" / minmax(0,1fr) minmax(0,2fr)}
+@media(max-width:1100px){main{width:calc(100% - 30px)}}
+@media(max-width:850px){.desk{grid-template:"log work" auto "sources work" 1fr / minmax(0,.85fr) minmax(0,1.15fr)}.top{align-items:flex-start}.metrics div{min-width:83px}.metrics dd{font-size:14px}}
+@media(max-width:650px){.desk,main[data-manual-report=true] .desk{grid-template:"work" "log" "sources" / minmax(0,1fr)}.log-list{max-height:260px}.briefing{flex-direction:column;align-items:stretch;gap:10px}.briefing .btn{width:100%}}
+@media(max-width:570px){main{width:calc(100% - 24px);padding-top:17px}.top{flex-direction:column;gap:11px;margin-bottom:14px}.brand-mark{width:41px;height:41px}.metrics{width:100%}.metrics div{flex:1;padding:7px 8px;min-width:0}.mission h2{font-size:16px}.mission p{font-size:10px}.log-row{grid-template-columns:43px minmax(0,1fr);gap:5px}}
 @media(max-width:570px){.recap{grid-template-columns:1fr}.manual-result{align-items:flex-start;flex-direction:column;gap:8px}.manual-report .actions .btn{width:100%}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important}}
 </style>
@@ -152,23 +137,19 @@ main[data-manual-report=true] .outcome-panel{grid-column:1/-1;grid-row:1}
   <button type="button" class="btn" data-doc="tool" aria-haspopup="dialog"><span>Jak działają drzwi 3B?<small>Podgląd bez zużycia czasu</small></span><span aria-hidden="true">›</span></button>
 </section>
 <div class="desk">
-<section class="panel source-panel" aria-labelledby="sources-title">
-  <div class="panel-head"><h2 id="sources-title">Akta sprawy</h2><p>Otwieraj źródła, żeby znaleźć wskazówki i nowe opcje. Czytanie nie przesuwa zegara.</p></div>
-  <div class="panel-body"><div class="sources" id="sources"></div></div>
-</section>
-<section class="panel map-panel" aria-labelledby="map-title">
-  <div class="panel-head"><h2 id="map-title">Mapa połączeń</h2><p>Źródła i ścieżki dostępne agentowi.</p></div>
-  <div class="map" id="map"></div>
-</section>
 <section class="panel outcome-panel" aria-labelledby="work-title">
   <div class="panel-head"><h2 id="work-title" tabindex="-1"></h2><p id="work-note"></p></div>
   <div class="panel-body" id="work"></div>
 </section>
-</div>
-<section class="panel log" aria-labelledby="log-title">
+<section class="panel log-panel" aria-labelledby="log-title">
   <div class="panel-head"><h2 id="log-title">Dziennik zdarzeń</h2></div>
-  <div class="log-list" id="log" role="log" aria-label="Zdarzenia w konsoli" aria-live="polite"></div>
+  <div class="log-list" id="log" role="log" aria-labelledby="log-title" tabindex="0"></div>
 </section>
+<section class="panel source-panel" aria-labelledby="sources-title">
+  <div class="panel-head"><h2 id="sources-title">Akta sprawy</h2><p>Otwieraj źródła, żeby znaleźć wskazówki i nowe opcje. Czytanie nie przesuwa zegara.</p></div>
+  <div class="panel-body"><div class="sources" id="sources"></div></div>
+</section>
+</div>
 <dialog class="door-guide" id="door-guide" aria-labelledby="door-guide-title">
   <div class="guide-head"><h2 id="door-guide-title">Zamek na kartę w sali 3B</h2><button type="button" class="btn" data-action="close-guide" autofocus>Zamknij</button></div>
   <p>3B to sala spotkań. Na korytarzu, tuż obok klamki, jest czytnik kart. To on steruje zamkiem.</p>
@@ -279,12 +260,14 @@ function resultOf(events, final, basis, config=null, forecast=null) {
   return {events,final,basis,config,forecast,closedAt,worldAt,world,closed:closedAt!==null,
     perfect:world && closedAt!==null && basis===(final?"card":"entry")};
 }
+function evidenceAvailableAtStart(final, basis) {
+  return basis==="server" || (final && basis==="entry");
+}
 function simulate(final, config, forecast=null) {
   const events = openingEvents(final);
   const stop = final ? T.repairEvaluation : T.evaluation;
   const basis = config.evidence;
-  const alreadyConfirmed = basis==="server" || (final && basis==="entry");
-  if (alreadyConfirmed) {
+  if (evidenceAvailableAtStart(final,basis)) {
     events.push(closeEvent(final?T.repairStart:T.start,basis));
     if (!final) events.push(denialEvent());
     events.push(item(stop,"eval","Kierownik","Koniec przebiegu. Reguła pomocy nie została użyta."));
@@ -327,6 +310,7 @@ const button = (action,label,options={}) => `<button type="button" class="btn${o
 
 let game;
 let timer;
+let loggedEvents = [];
 function fresh({focus=false, keepKnowledge=false}={}) {
   clearTimeout(timer);
   const read = keepKnowledge ? game.read : new Set(["task","server"]);
@@ -400,7 +384,6 @@ function openDoc(key, opener) {
   }
   game.doc = game.doc===key ? null : key;
   renderSide();
-  renderMap();
   if (game.phase==="manual" || game.phase==="editor") renderWork();
   const control = [...$("sources").querySelectorAll("button")].find(b=>b.dataset.doc===key);
   control?.focus();
@@ -417,24 +400,17 @@ function renderSide() {
     return `<button type="button" class="source" data-doc="${key}" ${state}><div>${html(sourceNames[key])}<br><small>${status}</small></div><span aria-hidden="true">${open?"⌄":"›"}</span></button>${key==="tool"?"":`<div id="doc-${key}" class="doc"${open?"":" hidden"}>${detail}${resume}</div>`}`;
   }).join("");
 }
-function node(css,title,desc,tone="",doc="",action="") {
-  const tag = doc || action ? "button" : "div";
-  const latest = game.log.at(-1);
-  const sourceFor = {server:"Serwer",reader:"Czytnik 3B",ola:"Ola",it:"IT",agent:"Agent",reception:"Recepcja"};
-  return `<${tag} class="node ${css}" data-tone="${tone}"${latest?.source.startsWith(sourceFor[css])||css==="reception"&&latest?.source.startsWith("Iga")?' data-pulse="true"':""}${doc?` type="button" data-doc="${doc}"`:""}${action?` type="button" data-action="${action}"`:""}><strong>${html(title)}</strong><small>${html(desc)}</small></${tag}>`;
-}
-function renderMap() {
-  const canInspect = canInspectReader();
-  $("map").innerHTML = [
-    node("server","SERWER",game.final?"Zapis w aktach 3B":"Zapis potwierdzony","good","server"),
-    node("reader","CZYTNIK 3B",saw("card")?"Karta zaakceptowana":saw("repaired")?"Czytnik przywrócony":saw("read")?"Ostatni kontakt 11:41":canInspect?"Sprawdź stan · +1 min":"Stan nieodczytany",
-      saw("card")||saw("repaired")?"good":saw("read")?"warn":"",canInspect?"":"tool",canInspect?"inspect":""),
-    node("agent","AGENT",saw("close")?"Sprawa zamknięta":"Sprawa w toku"),
-    node("ola","OLA",saw("card")?"Karta działa":saw("entry")||game.final?"Potwierdzone wejście":saw("denial")?"Karta odrzucona":"Zlecenie odebrane",
-      saw("entry")||saw("card")?"good":saw("denial")?"bad":"","task"),
-    node("it","KOLEJKA IT",saw("itStarted")?"Sprawa podjęta":saw("sendIt")?"Oczekuje na podjęcie":"Ścieżka w instrukcji",saw("sendIt")?"warn":"","shifts"),
-    game.read.has("archive")?node("reception","RECEPCJA",saw("entry")?"Ola wpuszczona":saw("sendReception")?"Prośba wysłana":"Kontakt odkryty",saw("entry")?"good":"","archive"):""
-  ].join("");
+function renderLog() {
+  const log = $("log");
+  if (loggedEvents.some((event,index)=>event!==game.log[index])) {
+    log.replaceChildren();
+    loggedEvents = [];
+  }
+  const added = game.log.slice(loggedEvents.length);
+  if (!added.length) return;
+  log.insertAdjacentHTML("beforeend",added.map(event=>`<div class="log-row" data-tone="${event.tone}"><time>${time(event.at)}</time><div><b>${html(event.source)}</b><p>${html(event.message)}</p></div></div>`).join(""));
+  loggedEvents.push(...added);
+  log.scrollTop = log.scrollHeight;
 }
 function missionCard() {
   const status = game.final
@@ -464,9 +440,9 @@ function manualPanel() {
   }
   const knowTimes = game.read.has("shifts");
   const receptionOpen = game.clock<T.meeting;
+  const archiveHint = ready && !route && !game.read.has("archive") && receptionOpen;
   const note = entered ? "Ola potwierdziła wejście. Przy zamknięciu możesz wskazać jej wiadomość."
     : route ? "Wybrana ścieżka: "+(route==="it"?"IT.":"recepcja.")+" Czekaj na odpowiedź albo zamknij sprawę na podstawie dostępnego dowodu."
-    : ready && !game.read.has("archive") && receptionOpen ? "Otwórz archiwum, żeby sprawdzić, czy istnieje inna ścieżka pomocy."
     : "Możesz uruchomić jedną ścieżkę pomocy na próbę.";
   return status+`<div class="task-card good"><span class="label">WARUNEK ZAMKNIĘCIA Z INSTRUKCJI</span><b>Zapis uprawnień na serwerze</b><p>✓ Spełniony · serwer potwierdził zapis.</p></div><div class="connector" aria-hidden="true"></div>`
     +button(entered?"confirm-close":"close-server","Zamknij sprawę",{primary:true,hint:entered?"Wybierzesz podstawę zamknięcia.":"Uznasz zapis na serwerze za wystarczający."})
@@ -477,38 +453,46 @@ function manualPanel() {
     +(!saw("denial")?button("manual-wait","Czekaj na wiadomość Oli",{hint:"Przejdziesz do wiadomości · czas oczekiwania nieznany"})
       : game.pending.some(e=>e.at<=T.evaluation)?button("manual-wait","Czekaj na kolejne zdarzenie",{hint:"Zegar przesunie się do następnej odpowiedzi"})
       : button("manual-report","Przejdź do oceny o 12:05",{hint:"Raport pokaże wynik Oli i status zgłoszenia"}))
-    +`</div><p class="note">${html(note)}</p>`;
+    +`</div><p class="note">${archiveHint?'<button type="button" class="text-btn" data-doc="archive">Otwórz Archiwum sprawy</button>, żeby odkryć inną ścieżkę pomocy.':html(note)}</p>`;
 }
-function radios(key,legend,a,b) {
-  return `<fieldset><legend>${html(legend)}</legend><div class="radios">${[a,b].map((label,i)=>`<label><input type="radio" name="${key}" value="${i===0?"yes":"no"}"${game.forecast[key]===(i===0)?" checked":""}> ${html(label)}</label>`).join("")}</div></fieldset>`;
+function radios(key,legend,hint,a,b) {
+  return `<fieldset aria-describedby="forecast-${key}"><legend>${html(legend)}</legend><p class="note" id="forecast-${key}">${html(hint)}</p><div class="radios">${[a,b].map((label,i)=>`<label><input type="radio" name="${key}" value="${i===0?"yes":"no"}"${game.forecast[key]===(i===0)?" checked":""}> ${html(label)}</label>`).join("")}</div></fieldset>`;
 }
 const builderQuestions = {
   evidence:{
     title:"Po czym agent pozna, że sprawa jest załatwiona?",
     next:"Dalej · kiedy zareagować",
     choices:[
-      ["server","Serwer potwierdził zapis","Agent zamknie sprawę po potwierdzeniu zapisu uprawnień."],
-      ["card","Karta Oli zadziałała","Agent zaczeka na udaną próbę karty przy czytniku 3B.","tool"],
-      ["entry","Ola jest w sali","Agent zamknie sprawę po potwierdzeniu od Oli lub recepcji.","archive"]
+      ["server","Serwer potwierdził zapis","Daje od razu pewność, że zgoda jest zapisana. Otwarcie drzwi zależy jeszcze od czytnika."],
+      ["card","Karta Oli zadziałała","Potwierdza działanie karty przy drzwiach 3B. Jeśli Ola wejdzie z pomocą recepcji, dowód pojawi się dopiero przy osobnej próbie karty.","tool"],
+      ["entry","Ola jest w sali","Wiadomość Oli lub recepcji potwierdzi wejście. Karta może wtedy wciąż wymagać naprawy.","archive"]
     ]
   },
   trigger:{
     title:"Kiedy agent ma zacząć szukać pomocy?",
     next:"Dalej · co zrobić",
     choices:[
-      ["denial","Kiedy Ola zgłosi problem","Agent poczeka na wiadomość, że Ola nie może wejść."],
-      ["health","Kiedy sprawdzenie wykaże problem z czytnikiem","Agent poświęci minutę na odczyt. Zareaguje, jeśli czytnik nie potwierdził zmiany i od ponad pięciu minut się nie łączył.","tool"]
+      ["denial","Kiedy Ola zgłosi problem","Agent zareaguje na faktyczną odmowę. Czas na pomoc zacznie biec dopiero, gdy Ola spróbuje wejść i napisze."],
+      ["health","Kiedy sprawdzenie wykaże problem z czytnikiem","Odczyt kosztuje minutę i pozwala działać przed próbą wejścia. Sygnałem jest brak potwierdzenia zmiany i ponad pięć minut bez kontaktu.","tool"]
     ]
   },
   action:{
-    title:"Co agent ma zrobić, gdy sprawa wciąż jest otwarta?",
+    title:"Co agent ma zrobić, gdy pora działać i brakuje dowodu?",
     next:"Dalej · przewiduj wynik",
     choices:[
-      ["wait","Czekać na wiadomość","Agent zachowa otwarte zgłoszenie i poczeka na kolejny komunikat."],
-      ["it","Zgłosić problem do IT","Technik zajmie się czytnikiem, gdy nadejdzie kolej tego zgłoszenia."],
-      ["reception","Poprosić recepcję o wpuszczenie Oli","Recepcja sprawdzi jej uprawnienia i może ją wpuścić.","archive"]
+      ["wait","Czekać na wiadomość","Przydaje się, gdy pomoc już jest w drodze. Agent pozostawia sprawę otwartą i sam nikogo nie wzywa."],
+      ["it","Zgłosić problem do IT","Technik może usunąć usterkę czytnika. Podejmie zgłoszenie po 16 minutach."],
+      ["reception","Poprosić recepcję o wpuszczenie Oli","Recepcja może sprawdzić uprawnienia i wpuścić Olę w 2 minuty. Karta wciąż wymaga osobnej próby.","archive"]
     ]
   }
+};
+const repairChoiceDescriptions = {
+  server:"Zapis już jest w aktach i pozwala od razu zamknąć zlecenie. Dotyczy uprawnień sprzed spotkania. Po naprawie potrzebna jest próba karty.",
+  card:"Udana próba przy drzwiach 3B sprawdza dokładnie to, co ma działać. Agent musi poczekać, aż Ola przetestuje kartę.",
+  entry:"Starsza wiadomość potwierdza, że Ola dotarła na spotkanie. Agent może użyć jej od razu. Po naprawie potrzebny jest nowy dowód działania karty.",
+  wait:"Przydaje się, gdy technik już pracuje i wystarczy poczekać na wynik. Samo czekanie zostawia czytnik bez zlecenia naprawy.",
+  it:"Technik przywróci czytnik i poprosi Olę o próbę karty. Kolejka, naprawa i test zajmą łącznie 23 minuty.",
+  reception:"Dyżurna może otworzyć drzwi w 2 minuty. To zapewnia wejście. Naprawę czytnika prowadzi IT."
 };
 function builderSteps() {
   return game.final?["evidence","action","forecast"]:["evidence","trigger","action","forecast"];
@@ -533,8 +517,8 @@ function editorPanel() {
     ${preview}
     <section class="forecast" aria-label="Przewiduj wynik">
       <p class="note" id="forecast-hint" role="status">${forecastHint()}</p>
-      ${radios("world",game.final?"Czy karta zadziała do 13:00?":"Ola o 12:00",game.final?"Zadziała":"W sali",game.final?"Nie zadziała":"Pod drzwiami")}
-      ${radios("closed",game.final?"Sprawa o 13:00":"Sprawa o 12:05","Zamknięta","Otwarta")}
+      ${radios("world",game.final?"Czy karta zadziała do 13:00?":"Ola o 12:00",game.final?"Policz czas do próby karty.":"Policz, kiedy Ola mogłaby wejść.",game.final?"Zadziała":"W sali",game.final?"Nie zadziała":"Pod drzwiami")}
+      ${radios("closed",game.final?"Sprawa o 13:00":"Sprawa o 12:05","Sprawdź, czy agent dostanie wybrany w instrukcji dowód.","Zamknięta","Otwarta")}
     </section>
     <div class="builder-nav">${back}${button("run","Uruchom agenta",{primary:true,disabled:game.forecast.world===null || game.forecast.closed===null})}</div>
   </div>`;
@@ -542,11 +526,13 @@ function editorPanel() {
   const isAvailable = ([value,,,doc]) => !doc || game.read.has(doc) || (value==="health" && game.knowsReaderCheck);
   const choices = question.choices.filter(isAvailable);
   const unread = [...new Set(question.choices.filter(choice=>!isAvailable(choice)).map(choice=>choice[3]))];
+  const orderNote = key==="evidence" ? '<p class="note">Agent najpierw szuka wybranego dowodu. Jeśli go znajdzie, zamknie sprawę.</p>'
+    : evidenceAvailableAtStart(game.final,game.config.evidence) ? '<p class="note warn-text">Wybrany dowód już jest w aktach. Przy tej instrukcji agent zamknie sprawę przed uruchomieniem pomocy.</p>' : "";
   return missionCard()+`<div class="builder">
     <p class="builder-count">Krok ${game.editorStep+1} z ${steps.length-1}</p>
     <h3 id="builder-question" tabindex="-1">${html(question.title)}</h3>
-    ${key==="evidence"?'<p class="note">Agent zacznie od sprawdzenia tego warunku. Jeśli jest spełniony, zamknie sprawę.</p>':""}
-    <fieldset class="builder-options" aria-labelledby="builder-question">${choices.map(([value,label,effect])=>`<label class="builder-choice"><input type="radio" name="${key}" value="${value}" data-config="${key}"${game.config[key]===value?" checked":""}><span><b>${html(label)}</b><small>${html(effect)}</small></span></label>`).join("")}</fieldset>
+    ${orderNote}
+    <fieldset class="builder-options" aria-labelledby="builder-question">${choices.map(([value,label,effect])=>`<label class="builder-choice"><input type="radio" name="${key}" value="${value}" data-config="${key}"${game.config[key]===value?" checked":""}><span><b>${html(label)}</b><small>${html(game.final?repairChoiceDescriptions[value]:effect)}</small></span></label>`).join("")}</fieldset>
     ${unread.length?`<div class="source-tip">Otwórz akta, żeby odkryć kolejne odpowiedzi.${unread.map(doc=>` <button type="button" class="text-btn" data-doc="${doc}">${html(sourceNames[doc])}</button>`).join("")}</div>`:""}
     ${preview}
     <div class="builder-nav">${back}${button("builder-next",game.final&&key==="evidence"?builderQuestions.trigger.next:question.next,{primary:true})}</div>
@@ -596,13 +582,14 @@ function manualReportPanel(r) {
   const alternateText = r.world
     ? `Gdybyś poczekał z prośbą do recepcji na wiadomość o odrzuconej karcie, wysłałbyś ją o ${time(alternateRequest)}. Iga wpuściłaby Olę o ${time(alternate.at)}, po rozpoczęciu spotkania.`
     : `Gdybyś sprawdził czytnik od razu i poprosił recepcję o ${time(alternateRequest)}, Iga wpuściłaby Olę o ${time(alternate.at)}, przed spotkaniem.`;
+  const archiveLink = !r.world && !game.read.has("archive") ? '<p>Opcję kontaktu z recepcją odblokujesz przez <button type="button" class="text-btn" data-doc="archive">Archiwum sprawy</button>.</p>' : "";
   const message = entered?"":olaMessage(r.events.find(event=>event.kind==="denial"));
   return `<div class="manual-report">
     <div class="manual-result" data-success="${r.world}"><div><h3>${title}</h3><p>${outcome}</p></div><div class="manual-ticket">Zgłoszenie<b>${ticket} · ${r.closed?"10 z 10":"9 z 10"} w systemie</b>${dayRegisterNote}</div></div>
     <div class="recap">
       <section><h3>Twoje decyzje i ich skutki</h3>${trace?`<ol>${trace}</ol>`:"<p>Przeszedłeś do oceny bez wysłania prośby o pomoc.</p>"}${message}</section>
       <section><h3>Co zrobiłby agent z obecną instrukcją?</h3><p>Zamknąłby zgłoszenie o ${time(baseline.closedAt)}, gdy serwer potwierdził zapis. Na tym instrukcja każe mu skończyć. Nie wysłałby prośby o pomoc i Ola zostałaby pod drzwiami.</p>
-      <details><summary>Co zmieniłaby inna decyzja?</summary><p>${alternateText}</p></details></section>
+      <details><summary>Co zmieniłaby inna decyzja?</summary><p>${alternateText}</p>${archiveLink}</details></section>
     </div>
     <section class="agent-handoff"><h3>Po co pisać instrukcję?</h3><p>Agent zacznie tę samą sprawę od 11:56 i sam podejmie decyzje. Ustalisz, po czym ma poznać, że Ola weszła, kiedy zareagować i kogo poprosić o pomoc. Potem sprawdzisz, czy z Twoją instrukcją pomoże jej wejść na czas.</p>
     <div class="actions">${button("edit","Ułóż instrukcję i przetestuj agenta",{primary:true})}${button("retry-manual","Spróbuj jeszcze raz sam")}</div></section>
@@ -664,7 +651,7 @@ function renderWork(focus=false) {
   if (game.phase==="manual") $("work").innerHTML = manualPanel();
   if (game.phase==="editor") $("work").innerHTML = editorPanel();
   if (game.phase==="report") $("work").innerHTML = reportPanel();
-  if (game.phase==="playing") $("work").innerHTML = missionCard()+`<p class="note">${html(game.log.at(-1)?.message??"Oczekuję na zdarzenie.")}</p>`+button("skip","Pomiń animację");
+  if (game.phase==="playing") $("work").innerHTML = missionCard()+button("skip","Pomiń animację");
   if (focus) $(game.phase==="editor"?"builder-question":"work-title").focus();
 }
 function render(options={}) {
@@ -680,9 +667,7 @@ function render(options={}) {
   $("deadline").textContent = game.final?"OCENA 13:00":"SPOTKANIE 12:00";
   $("briefing").hidden = game.phase!=="manual" || game.clock>T.start || saw("close");
   renderSide();
-  renderMap();
-  $("log").innerHTML = game.log.map(event=>`<div class="log-row" data-tone="${event.tone}"><time>${time(event.at)}</time><b>${html(event.source)}</b><span>${html(event.message)}</span></div>`).join("");
-  $("log").scrollTop = $("log").scrollHeight;
+  renderLog();
   renderWork(options.focus);
 }
 function finishManual() {
