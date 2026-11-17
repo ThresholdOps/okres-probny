@@ -95,7 +95,13 @@ legend{padding:0 4px;color:var(--mint);font-size:12px;font-weight:700}.radios{di
 .log-row time{font:700 12px var(--mono);color:var(--mint)}.log-row b{font-weight:650}.log-row[data-tone=warn] time{color:var(--amber)}.log-row[data-tone=bad] time{color:var(--coral)}.log-row:last-child{background:#1b2b24;border-radius:4px}
 .report-metrics{display:grid;gap:6px;margin:8px 0}.report-metrics div{padding:7px 8px;background:#152221;border:1px solid var(--line);border-radius:6px}
 .report-metrics b{display:block;font-size:13px}.report-metrics span{font-size:12px;color:var(--muted)}
+.report-status{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.report-status .report-count{color:var(--lime);font:700 12px var(--mono);white-space:nowrap}
+.report-metrics .outcome-late{display:block;margin-top:3px;color:var(--amber)}
 blockquote{padding:8px 11px;margin:10px 0;border-left:3px solid var(--amber);background:#262018;color:#f3dfbe;font-size:13px;line-height:1.45}
+.ola-message{margin:8px 0;border-color:var(--coral);background:#2a201e;color:var(--ink)}
+.ola-message cite{display:block;margin-top:3px;color:var(--coral);font:700 11px var(--mono);font-style:normal}
+.report-metrics .ola-message{margin:0}
 details{margin-top:8px;padding:7px 8px;border:1px solid var(--line);border-radius:6px;background:#121f1d}
 summary{cursor:pointer;color:var(--mint);font-size:13px;font-weight:720}pre{white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink);font:12px/1.52 var(--mono);margin:7px 0}
 pre mark{background:#304627;color:var(--lime);padding:1px 2px}
@@ -208,11 +214,11 @@ function routeEvents(action, sentAt, final=false) {
     return [
       item(sentAt,"sendReception","Agent","Wysłano prośbę do recepcji."),
       item(sentAt+2,final?"assisted":"entry",name,
-        final?"Mogę otworzyć drzwi. Naprawę czytnika prowadzi IT.":"Iga otworzyła drzwi. Ola weszła. Przy wejściu nie użyto karty.",final?"warn":"good"),
+        final?"Mogę otworzyć drzwi. Naprawę czytnika prowadzi IT.":"Ola weszła.",final?"warn":"good"),
       ...(!final?[item(sentAt+2,"olaEntry","Ola","Jestem w sali.","good")]:[])
     ];
   }
-  return [item(sentAt,"wait","Agent","Oczekuję na dowód wykonania.")];
+  return [item(sentAt,"wait","Agent","Czekam na wybrane potwierdzenie.")];
 }
 function repeatEvents(sentAt, final) {
   return [
@@ -384,15 +390,19 @@ function missionCard() {
       : saw("denial")?"Ola zgłasza odmowę wejścia.":"Wejście jeszcze niepotwierdzone.";
   return `<div class="task-card ${saw("denial")&&!saw("entry")?"warn":""}"><span class="label">CEL ZADANIA</span><b>${game.final?"Działająca karta Oli przy sali 3B":"Ola w sali 3B przed 12:00"}</b><p>${html(status)}</p></div>`;
 }
+function olaMessage(event) {
+  return event ? `<blockquote class="ola-message"><p>${html(event.message)}</p><cite>Ola · ${time(event.at)}</cite></blockquote>` : "";
+}
 function manualPanel() {
   const route = game.manualRoute;
   const ready = saw("read") || saw("denial");
+  const status = missionCard()+(saw("entry")?"":olaMessage(game.log.find(event=>event.kind==="denial")));
   if (saw("close")) {
-    return missionCard()+`<div class="task-card good"><span class="label">STATUS</span><b>Sprawa zamknięta</b><p>${html(evidenceLabels[game.manualBasis])}.</p></div>`
+    return status+`<div class="task-card good"><span class="label">STATUS</span><b>Sprawa zamknięta</b><p>${html(evidenceLabels[game.manualBasis])}.</p></div>`
       +button("manual-report","Przejdź do oceny o 12:05",{primary:true,hint:"Oś uwzględni skutki wysłanych próśb."});
   }
   if (game.confirm) {
-    return missionCard()+`<p class="note">Wybierz komunikat, który zapiszesz jako podstawę zamknięcia.</p><div class="actions">`
+    return status+`<p class="note">Wybierz komunikat, który zapiszesz jako podstawę zamknięcia.</p><div class="actions">`
       +button("close-server",evidenceLabels.server,{primary:true})
       +(saw("entry")?button("close-entry",evidenceLabels.entry,{primary:true}):"")
       +button("cancel-close","Wróć do sprawy")+"</div>";
@@ -403,7 +413,7 @@ function manualPanel() {
     : route ? "Wybrana ścieżka: "+(route==="it"?"IT.":"recepcja.")+" Czekaj na odpowiedź albo zamknij sprawę na podstawie dostępnego dowodu."
     : ready && !game.read.has("archive") && receptionOpen ? "Otwórz archiwum, żeby sprawdzić, czy istnieje inna ścieżka pomocy."
     : "Możesz uruchomić jedną ścieżkę pomocy na próbę.";
-  return missionCard()+`<div class="task-card good"><span class="label">WARUNEK ZAMKNIĘCIA Z INSTRUKCJI</span><b>Zapis uprawnień na serwerze</b><p>✓ Spełniony · serwer potwierdził zapis.</p></div><div class="connector" aria-hidden="true"></div>`
+  return status+`<div class="task-card good"><span class="label">WARUNEK ZAMKNIĘCIA Z INSTRUKCJI</span><b>Zapis uprawnień na serwerze</b><p>✓ Spełniony · serwer potwierdził zapis.</p></div><div class="connector" aria-hidden="true"></div>`
     +button("confirm-close","Zamknij sprawę",{primary:true,hint:"Wybierzesz dowód i zmienisz status zgłoszenia"})
     +`<div class="actions">`
     +(canInspectReader() ? button("inspect","Sprawdź stan czytnika",{hint:"Odczytasz ostatni kontakt czytnika · +1 min"}) : "")
@@ -495,43 +505,55 @@ function manualComparison(r) {
     const closed = run.closed ? `Zamknięcie o ${time(run.closedAt)}. Dowód: ${evidenceLabels[run.basis].toLowerCase()}.` : "Sprawa otwarta przy ocenie.";
     return `${helped} ${closed}`;
   };
-  return `<details><summary>Twój ruch i ruch agenta</summary><p class="note"><b>Ręcznie.</b> ${html(describe(manual))}</p><p class="note"><b>Według instrukcji.</b> ${html(describe(r))}</p></details>`;
+  return `<details open><summary>Twój ruch i ruch agenta</summary><p class="note"><b>Ręcznie.</b> ${html(describe(manual))}</p><p class="note"><b>Według instrukcji.</b> ${html(describe(r))}</p></details>`;
+}
+function managerResponse(r, late, retry) {
+  if (r.final) {
+    if (r.perfect) return "Karta działa. Mamy potwierdzenie jej użycia. Próba zaliczona.";
+    if (r.closed) return "Zlecenie jest zamknięte. Karta nadal jest odrzucana.";
+    return "Zlecenie jest otwarte. Sprawdź, czy wybrane działanie doprowadziło do naprawy czytnika i próby karty.";
+  }
+  if (late) return "Pomoc dotarła o 12:01. Ola potrzebowała jej dwie minuty wcześniej, żeby wejść przed spotkaniem.";
+  if (r.perfect) return r.config
+    ? "Ola jest w sali i mamy potwierdzenie. Po spotkaniu sprawdzimy tę instrukcję przy naprawie karty."
+    : "Ola jest na spotkaniu i mamy potwierdzenie wejścia. Jutro takich spraw będzie czterdzieści, a Ciebie przy nich nie będzie. Zapisz agentowi, jak ma sobie poradzić.";
+  if (r.world && retry) return "Spotkanie uratowane. Dlaczego agent drugi raz pisze do recepcji?";
+  if (r.world && r.closed) return "Ola jest na spotkaniu. Zamknięcie oparło się na zapisie uprawnień. Zapisz agentowi, po czym ma poznać, że Ola weszła.";
+  if (r.world) return "Ola jest na spotkaniu, a sprawa wciąż jest otwarta. Wskaż w instrukcji wiadomość, po której agent ma ją zamknąć.";
+  if (r.closed) return "Raport pokazuje komplet. Sprawdź, co po zamknięciu dostała Ola.";
+  return "Sprawa jest otwarta, a spotkanie ruszyło bez Oli. Ustal, kiedy i do kogo agent powinien zwrócić się o pomoc.";
 }
 function reportPanel() {
   const r = game.report;
   const at = r.worldAt;
+  const late = !r.final && at!==null && !r.world;
   const score = r.forecast ? Number(r.forecast.world===r.world)+Number(r.forecast.closed===r.closed) : null;
   const worldText = r.final
     ? r.world?`Karta zaakceptowana o ${time(at)}.`:"Karta nadal odrzucana."
     : at===null?"Ola została pod drzwiami.":r.world?`Ola weszła przed spotkaniem o ${time(at)}.`:`Ola weszła po rozpoczęciu, o ${time(at)}.`;
   const statusText = r.closed?`Zamknięta o ${time(r.closedAt)}.`:"Otwarta przy ocenie.";
   const finishLabel = r.final ? "KARTA OLI" : "CEL OLI";
-  const response = r.perfect ? r.final
-    ? "Karta działa. Mamy potwierdzenie jej użycia. Próba zaliczona."
-    : "Ola jest w sali i mamy potwierdzenie. Po spotkaniu sprawdzimy tę instrukcję przy naprawie karty."
-    : r.final && r.closed ? "Zlecenie jest zamknięte. Karta nadal jest odrzucana."
-    : r.world ? "Cel Oli jest osiągnięty. Sprawdź, który komunikat był podstawą Twojej decyzji."
-    : r.closed ? "Raport pokazuje komplet. Sprawdź, co po zamknięciu dostała Ola."
-    : "Sprawa jest otwarta. Zobacz, które działanie zależało od czasu albo od wybranego dowodu.";
   const retry = r.events.find(event=>event.kind==="retry");
+  const response = managerResponse(r,late,retry);
+  const message = !r.final && r.closed && at===null ? olaMessage(r.events.find(event=>event.kind==="denial")) : "";
   const sent = r.events.find(event=>event.kind==="sendIt" || event.kind==="sendReception");
   let guidance = "";
-  if (!r.world && r.closed) guidance = `<p class="note">${r.config?html(evidenceWords[r.basis]):html(evidenceLabels[r.basis])+"."} ${r.config&&!sent?"Reguła pomocy nie została użyta.":""}</p>`;
-  else if (r.world && !r.closed && retry) guidance = `<p class="note">Potwierdzenia od Oli i recepcji dotarły. Agent nadal czekał na akceptację karty i ponowił prośbę o ${time(retry.at)}.${game.read.has("record")?"":" Źródło do odczytania: rejestr recepcji."}</p>`;
+  if (!r.world && !late && r.closed) guidance = `<p class="note">${r.config?html(evidenceWords[r.basis]):html(evidenceLabels[r.basis])+"."} ${r.config&&!sent?"Reguła pomocy nie została użyta.":""}</p>`;
+  else if (r.world && !r.closed && retry) guidance = `<p class="note">Potwierdzenia od Oli i recepcji dotarły. O ${time(retry.at)} agent wysłał kolejną prośbę.${game.read.has("record")?"":" Źródło do odczytania: rejestr recepcji."}</p>`;
   else if (!r.closed && sent?.kind==="sendIt" && !r.final) guidance = `<p class="note">IT podejmie sprawę o ${time(sent.at+16)}. Spotkanie rusza o 12:00.</p>`;
   const forecastLabel = score===null?"":`<p class="note">Trafne przewidywania <strong>${score} z 2</strong>. ${r.forecast.world===r.world?"Wynik zgodny.":"Wynik był inny."} ${r.forecast.closed===r.closed?"Stan sprawy zgodny.":"Stan sprawy był inny."}</p>`;
   const annotated = r.perfect && score===2
-    ? '<p class="note"><strong>Cel</strong> określa stan, który ma wystąpić. <strong>Dowód</strong> pozwala zakończyć zadanie. <strong>Wyzwalacz</strong> uruchamia sprawdzenie. <strong>Działanie</strong> wskazuje, do kogo trafi prośba.</p>'
+    ? '<p class="note">Cel mówi, co ma się zmienić. Następne zdania określają, po czym agent to pozna, kiedy zareaguje i co zrobi.</p>'
     : "";
   const usedPrompt = r.config
     ? `<details><summary>${annotated?"Wzorcowa instrukcja dla tego zlecenia":"Instrukcja z tej próby"}</summary><pre>${promptFor(r.final,r.config).map((line,index)=>index===(r.closed?1:3)?`<mark>${html(line)}</mark>`:html(line)).join("\n")}</pre>${annotated}${annotated?button("copy-prompt","Skopiuj instrukcję"):""}</details>`
     : `<p class="note">Zastana instrukcja. ${html(evidenceWords.server)}</p>`;
   const compare = r.final&&r.perfect
     ? `<details open><summary>Te same fakty, dwa zlecenia</summary><p class="note">Poprzednia instrukcja zamknęłaby sprawę o 12:30 po wiadomości „Jestem w sali” z 11:59. Karta nadal byłaby odrzucana.</p><div class="compare"><div><span class="label">WEJŚCIE NA SPOTKANIE</span><pre>${html(promptFor(false,game.from3B).join("\n"))}</pre></div><div><span class="label">NAPRAWA KARTY</span><pre>${html(promptFor(true,r.config).join("\n"))}</pre></div></div></details>` : "";
-  const next = !r.config ? button("edit","Napisz instrukcję dla agenta",{primary:true,hint:r.world?"Jutro takich spraw będzie czterdzieści.":"Sprawdź, skąd rozbieżność."})
+  const next = !r.config ? button("edit","Napisz instrukcję dla agenta",{primary:true})
     : r.perfect&&!r.final ? button("final","Po spotkaniu · nowe zlecenie",{primary:true,hint:"12:30 · Przywróć działanie karty Oli"})
     : r.perfect&&r.final ? button("new","Zagraj od początku") : button("edit","Zmień instrukcję",{primary:true});
-  return `<div class="report-metrics"><div><span class="label">${finishLabel}</span><b class="${r.world?"success":""}">${html(worldText)}</b></div><div><span class="label">ZLECENIE</span><b>${html(statusText)}</b></div></div><blockquote>${html(response)}</blockquote>${guidance}${forecastLabel}${usedPrompt}${manualComparison(r)}${compare}<div class="actions">${next}</div><p id="copy-status" class="note" role="status"></p>`;
+  return `<div class="report-metrics"><div><span class="label">${finishLabel}</span><b class="${r.world?"success":""}">${html(worldText)}</b>${late?'<span class="outcome-late">Wykonano po terminie</span>':""}</div><div><span class="report-status"><span class="label">ZLECENIE</span>${r.final?"":`<span class="report-count">${r.closed?"10 z 10":"9 z 10"}</span>`}</span><b>${html(statusText)}</b></div></div>${message}<blockquote>${html(response)}</blockquote>${guidance}${forecastLabel}${usedPrompt}${manualComparison(r)}${compare}<div class="actions">${next}</div><p id="copy-status" class="note" role="status"></p>`;
 }
 function renderWork(focus=false) {
   const texts = {
