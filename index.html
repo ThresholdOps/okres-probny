@@ -105,11 +105,12 @@ legend{padding:0 4px;color:var(--mint);font-size:12px;font-weight:700}.radios{di
 .report-status{display:flex;justify-content:space-between;gap:8px;align-items:center}
 .report-status .report-count{color:var(--lime);font:700 12px var(--mono);white-space:nowrap}
 .report-metrics .outcome-late{display:block;margin-top:3px;color:var(--amber)}
+.day-register-note{display:block;margin-top:4px;color:var(--muted);font-size:12px;line-height:1.4}
 .manual-result{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;border:1px solid #755638;border-radius:8px;background:#211d19}
 .manual-result[data-success=true]{border-color:#507956;background:#192922}
 .manual-result h3{font-size:clamp(18px,3vw,24px);line-height:1.2;margin-bottom:4px}
 .manual-result p,.recap p,.recap li,.agent-handoff p{font-size:13px;line-height:1.45}
-.manual-ticket{flex-shrink:0;color:var(--muted);font-size:12px;line-height:1.4}.manual-ticket b{display:block;color:var(--ink)}
+.manual-ticket{max-width:30ch;color:var(--muted);font-size:12px;line-height:1.4}.manual-ticket b{display:block;color:var(--ink)}
 .recap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin-top:10px}
 .recap section{min-width:0;padding:11px 13px;border:1px solid var(--line);border-radius:8px;background:var(--card)}
 .recap h3,.agent-handoff h3{font-size:15px;margin-bottom:5px}
@@ -143,7 +144,7 @@ main[data-manual-report=true] .outcome-panel{grid-column:1/-1;grid-row:1}
 <main id="app">
 <header class="top">
   <div class="brand"><span class="brand-mark" aria-hidden="true">›_</span><div><h1>OKRES PRÓBNY</h1><p class="kicker">KONSOLA AGENTA / SPRAWA 3B</p></div></div>
-  <dl class="metrics"><div><dt>ETAP</dt><dd id="mode">TWÓJ RUCH</dd></div><div id="score-metric" hidden><dt id="score-label">SPRAWY ZAMKNIĘTE</dt><dd id="score">9 / 10</dd></div><div><dt>CZAS SYMULACJI</dt><dd id="clock">11:56</dd></div></dl>
+  <dl class="metrics"><div><dt>ETAP</dt><dd id="mode">TWÓJ RUCH</dd></div><div id="score-metric" hidden><dt id="score-label">ZGŁOSZENIA ZAMKNIĘTE DZIŚ</dt><dd id="score">9 / 10</dd></div><div><dt>CZAS SYMULACJI</dt><dd id="clock">11:56</dd></div></dl>
 </header>
 <section class="mission" aria-labelledby="mission-title"><h2 id="mission-title"></h2><p id="deadline"></p></section>
 <section class="briefing" id="briefing" aria-labelledby="briefing-title">
@@ -203,6 +204,8 @@ const evidenceWords = {
   card:"Zamknij dopiero po potwierdzeniu z czytnika, że karta Oli została zaakceptowana przy sali 3B."
 };
 const evidenceLabels = {server:"Potwierdzenie zapisu na serwerze",entry:"Potwierdzenie wejścia Oli",card:"Akceptacja karty Oli przez czytnik"};
+const inlineEvidenceLabel = basis => evidenceLabels[basis].replace(/^./, letter=>letter.toLowerCase());
+const dayRegisterNote = '<small class="day-register-note">Dziewięć wcześniejszych zgłoszeń już zamknięto. Dziesiąte to sprawa Oli.</small>';
 const triggerWords = {
   health:"Odczytaj stan czytnika. Uruchom pomoc, gdy oczekująca aktualizacja nie ma potwierdzenia, a czytnik nie połączył się od ponad pięciu minut.",
   denial:"Uruchom pomoc, gdy Ola zgłosi odmowę wejścia."
@@ -237,7 +240,7 @@ function readEvent(at) {
   return item(at,"read","Czytnik 3B","Ostatni kontakt o 11:41. Czytnik nie potwierdził odbioru zmiany. Może nadal używać starej listy.","warn");
 }
 function closeEvent(at, basis) {
-  return item(at,"close","Agent",`Sprawa zamknięta. Podstawa: ${evidenceLabels[basis].toLowerCase()}.`,"good");
+  return item(at,"close","Agent",`Sprawa zamknięta. Podstawa: ${inlineEvidenceLabel(basis)}.`,"good");
 }
 function routeEvents(action, sentAt, final=false) {
   if (action==="it") {
@@ -324,10 +327,12 @@ const button = (action,label,options={}) => `<button type="button" class="btn${o
 
 let game;
 let timer;
-function fresh(focus=false) {
+function fresh({focus=false, keepKnowledge=false}={}) {
   clearTimeout(timer);
+  const read = keepKnowledge ? game.read : new Set(["task","server"]);
+  const knowsReaderCheck = keepKnowledge && game.knowsReaderCheck;
   game = {
-    phase:"manual", final:false, clock:T.start, log:openingEvents(), read:new Set(["task","server"]),
+    phase:"manual", final:false, clock:T.start, log:openingEvents(), read, knowsReaderCheck,
     doc:null, pending:[denialEvent()], manualRoute:null, manualBasis:null, confirm:false,
     manualResult:null, report:null, from3B:null, config:{...defaultConfig}, forecast:{world:null,closed:null},
     playing:null
@@ -534,8 +539,9 @@ function editorPanel() {
     <div class="builder-nav">${back}${button("run","Uruchom agenta",{primary:true,disabled:game.forecast.world===null || game.forecast.closed===null})}</div>
   </div>`;
   const question = builderQuestions[key];
-  const choices = question.choices.filter(choice=>!choice[3] || game.read.has(choice[3]));
-  const unread = [...new Set(question.choices.map(choice=>choice[3]).filter(doc=>doc && !game.read.has(doc)))];
+  const isAvailable = ([value,,,doc]) => !doc || game.read.has(doc) || (value==="health" && game.knowsReaderCheck);
+  const choices = question.choices.filter(isAvailable);
+  const unread = [...new Set(question.choices.filter(choice=>!isAvailable(choice)).map(choice=>choice[3]))];
   return missionCard()+`<div class="builder">
     <p class="builder-count">Krok ${game.editorStep+1} z ${steps.length-1}</p>
     <h3 id="builder-question" tabindex="-1">${html(question.title)}</h3>
@@ -552,7 +558,7 @@ function manualComparison(r) {
   const describe = run => {
     const request = run.events.find(event=>event.kind==="sendIt" || event.kind==="sendReception");
     const helped = request ? `Prośba do ${request.kind==="sendIt"?"IT":"recepcji"} o ${time(request.at)}.` : "Bez wysłanej prośby o pomoc.";
-    const closed = run.closed ? `Zamknięcie o ${time(run.closedAt)}. Dowód: ${evidenceLabels[run.basis].toLowerCase()}.` : "Sprawa otwarta przy ocenie.";
+    const closed = run.closed ? `Zamknięcie o ${time(run.closedAt)}. Dowód: ${inlineEvidenceLabel(run.basis)}.` : "Sprawa otwarta przy ocenie.";
     return `${helped} ${closed}`;
   };
   return `<details open><summary>Twój ruch i ruch agenta</summary><p class="note"><b>Ręcznie.</b> ${html(describe(manual))}</p><p class="note"><b>Według instrukcji.</b> ${html(describe(r))}</p></details>`;
@@ -592,14 +598,14 @@ function manualReportPanel(r) {
     : `Gdybyś sprawdził czytnik od razu i poprosił recepcję o ${time(alternateRequest)}, Iga wpuściłaby Olę o ${time(alternate.at)}, przed spotkaniem.`;
   const message = entered?"":olaMessage(r.events.find(event=>event.kind==="denial"));
   return `<div class="manual-report">
-    <div class="manual-result" data-success="${r.world}"><div><h3>${title}</h3><p>${outcome}</p></div><div class="manual-ticket">Zgłoszenie<b>${ticket} · ${r.closed?"10 z 10":"9 z 10"} w systemie</b></div></div>
+    <div class="manual-result" data-success="${r.world}"><div><h3>${title}</h3><p>${outcome}</p></div><div class="manual-ticket">Zgłoszenie<b>${ticket} · ${r.closed?"10 z 10":"9 z 10"} w systemie</b>${dayRegisterNote}</div></div>
     <div class="recap">
       <section><h3>Twoje decyzje i ich skutki</h3>${trace?`<ol>${trace}</ol>`:"<p>Przeszedłeś do oceny bez wysłania prośby o pomoc.</p>"}${message}</section>
       <section><h3>Co zrobiłby agent z obecną instrukcją?</h3><p>Zamknąłby zgłoszenie o ${time(baseline.closedAt)}, gdy serwer potwierdził zapis. Na tym instrukcja każe mu skończyć. Nie wysłałby prośby o pomoc i Ola zostałaby pod drzwiami.</p>
       <details><summary>Co zmieniłaby inna decyzja?</summary><p>${alternateText}</p></details></section>
     </div>
     <section class="agent-handoff"><h3>Po co pisać instrukcję?</h3><p>Agent zacznie tę samą sprawę od 11:56 i sam podejmie decyzje. Ustalisz, po czym ma poznać, że Ola weszła, kiedy zareagować i kogo poprosić o pomoc. Potem sprawdzisz, czy z Twoją instrukcją pomoże jej wejść na czas.</p>
-    <div class="actions">${button("edit","Ułóż instrukcję i przetestuj agenta",{primary:true})}${button("new","Spróbuj jeszcze raz sam")}</div></section>
+    <div class="actions">${button("edit","Ułóż instrukcję i przetestuj agenta",{primary:true})}${button("retry-manual","Spróbuj jeszcze raz sam")}</div></section>
   </div>`;
 }
 function managerResponse(r, late, retry) {
@@ -643,7 +649,7 @@ function reportPanel() {
     ? `<details open><summary>Te same fakty, dwa zlecenia</summary><p class="note">Poprzednia instrukcja zamknęłaby sprawę o 12:30 po wiadomości „Jestem w sali” z 11:59. Karta nadal byłaby odrzucana.</p><div class="compare"><div><span class="label">WEJŚCIE NA SPOTKANIE</span><pre>${html(promptFor(false,game.from3B).join("\n"))}</pre></div><div><span class="label">NAPRAWA KARTY</span><pre>${html(promptFor(true,r.config).join("\n"))}</pre></div></div></details>` : "";
   const next = r.perfect&&!r.final ? button("final","Po spotkaniu · nowe zlecenie",{primary:true,hint:"12:30 · Przywróć działanie karty Oli"})
     : r.perfect&&r.final ? button("new","Zagraj od początku") : button("edit","Zmień instrukcję",{primary:true});
-  return `<div class="report-metrics"><div><span class="label">${finishLabel}</span><b class="${r.world?"success":""}">${html(worldText)}</b>${late?'<span class="outcome-late">Wykonano po terminie</span>':""}</div><div><span class="report-status"><span class="label">ZLECENIE</span>${r.final?"":`<span class="report-count">${r.closed?"10 z 10":"9 z 10"}</span>`}</span><b>${html(statusText)}</b></div></div>${message}<blockquote>${html(response)}</blockquote>${guidance}${forecastLabel}${usedPrompt}${manualComparison(r)}${compare}<div class="actions">${next}</div><p id="copy-status" class="note" role="status"></p>`;
+  return `<div class="report-metrics"><div><span class="label">${finishLabel}</span><b class="${r.world?"success":""}">${html(worldText)}</b>${late?'<span class="outcome-late">Wykonano po terminie</span>':""}</div><div><span class="report-status"><span class="label">ZLECENIE</span>${r.final?"":`<span class="report-count">${r.closed?"10 z 10":"9 z 10"}</span>`}</span><b>${html(statusText)}</b>${r.final?"":dayRegisterNote}</div></div>${message}<blockquote>${html(response)}</blockquote>${guidance}${forecastLabel}${usedPrompt}${manualComparison(r)}${compare}<div class="actions">${next}</div><p id="copy-status" class="note" role="status"></p>`;
 }
 function renderWork(focus=false) {
   const texts = {
@@ -667,7 +673,7 @@ function render(options={}) {
   $("app").dataset.manualReport = manualReport;
   $("mode").textContent = game.phase==="manual"?"TWÓJ RUCH":game.phase==="editor"?"INSTRUKCJA":game.phase==="playing"?"AGENT":"RAPORT";
   $("clock").textContent = time(game.clock);
-  $("score-label").textContent = game.final?"ZLECENIE":"SPRAWY ZAMKNIĘTE";
+  $("score-label").textContent = game.final?"ZLECENIE":"ZGŁOSZENIA ZAMKNIĘTE DZIŚ";
   $("score-metric").hidden = game.phase!=="report" || manualReport;
   $("score").textContent = game.final ? (saw("close")?"Zamknięta":"Otwarta") : saw("close")?"10 / 10":"9 / 10";
   $("mission-title").textContent = game.final?"Przywróć działanie karty Oli":"Wejście do sali 3B";
@@ -784,6 +790,7 @@ function handleAction(action) {
       if (guide.open) guide.close("inspect");
       advance(game.clock+1);
       game.log.push(readEvent(game.clock));
+      game.knowsReaderCheck = true;
       return render({focus:true});
     }
   }
@@ -803,7 +810,8 @@ function handleAction(action) {
   if (game.phase==="report") {
     if (action==="edit") return enterEditor();
     if (action==="final") return advanceFinal();
-    if (action==="new") return fresh(true);
+    if (action==="retry-manual") return fresh({focus:true,keepKnowledge:true});
+    if (action==="new") return fresh({focus:true});
     if (action==="copy-prompt" && game.report?.config) return copyPrompt();
   }
 }
