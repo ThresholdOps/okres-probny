@@ -28,9 +28,9 @@ h1{font-size:clamp(31px,5vw,48px);line-height:1;letter-spacing:-.056em}
 #score{color:var(--lime)}#clock{color:var(--amber)}
 .mission{border:1px solid #355149;background:#14211f;border-radius:9px;padding:11px 15px;margin-bottom:13px;display:flex;justify-content:space-between;align-items:center;gap:10px}
 .mission h2{font-size:19px;letter-spacing:-.025em}.mission p{font:700 12px var(--mono);color:var(--amber);flex-shrink:0}
-.briefing{display:flex;align-items:center;gap:16px;justify-content:space-between;margin-bottom:13px;padding:12px 15px;border:1px solid #476755;border-radius:9px;background:#19251e}
-.briefing h2{font-size:17px}.briefing p{max-width:78ch;margin-top:4px;color:var(--muted);font-size:13px;line-height:1.45}
-.briefing .btn{width:auto;flex-shrink:0}.briefing strong{color:var(--ink)}
+.briefing{display:flex;align-items:center;gap:16px;justify-content:space-between;margin-bottom:13px;padding:12px 15px;border:1px solid #755638;border-radius:9px;background:#211d19}
+.briefing h2{color:var(--amber);font:700 12px var(--mono)}.briefing p{max-width:76ch;margin-top:5px;font-size:15px;line-height:1.4}
+.briefing .btn{width:auto;flex-shrink:0}
 .desk{display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.75fr) minmax(0,1.24fr);gap:12px;align-items:start}
 .panel{border:1px solid var(--line);border-radius:10px;background:var(--panel);min-width:0;overflow:hidden}
 .panel-head{padding:12px 14px;border-bottom:1px solid var(--line)}
@@ -43,13 +43,20 @@ h1{font-size:clamp(31px,5vw,48px);line-height:1;letter-spacing:-.056em}
 .doc{background:#101e1b;border:1px solid #3a5a50;padding:9px;border-radius:6px;font-size:13px;line-height:1.45}
 .doc h3{font-size:13px;color:var(--mint);margin-bottom:4px}
 .doc-effect{border-top:1px solid #3a5a50;padding-top:6px;margin-top:7px;color:var(--mint);font-size:12px}
-.door-facts{display:grid;gap:6px;margin:8px 0;padding:0}
-.door-facts div{padding:7px 8px;border:1px solid #365049;border-radius:6px;background:#172622}
-.door-facts dt{color:var(--ink);font-weight:720}.door-facts dd{margin:2px 0 0;color:var(--muted)}
-.doc .btn{margin-top:8px}
+.door-guide{width:min(640px,calc(100% - 24px));max-height:calc(100% - 24px);padding:18px;border:1px solid #4e7966;border-radius:12px;background:var(--panel);color:var(--ink);overflow:auto}
+.door-guide::backdrop{background:#060b0ddb}
+.guide-head{display:flex;align-items:start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.guide-head h2{font-size:21px;line-height:1.2}.guide-head .btn{width:auto;min-height:34px;flex-shrink:0}
+.door-guide p,.door-steps{font-size:14px;line-height:1.45}
+.door-steps{display:grid;gap:8px;margin:12px 0;padding:10px 12px 10px 36px;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+.door-steps li::marker{color:var(--mint);font-weight:700}.door-steps b{display:block}.door-steps span{color:var(--muted)}
+.door-demo{display:grid;gap:5px;padding:8px 10px}.door-demo label{display:flex;align-items:center;gap:6px;min-height:30px;cursor:pointer}
+.door-demo input{margin:0}.door-demo p{color:var(--mint);background:#192a23;border-radius:5px;padding:6px 8px}.door-demo p[data-denied=true]{color:var(--amber);background:#282119}
+.guide-next{margin-top:12px}.guide-next .btn{margin-top:6px}
 .map{margin:12px;position:relative;isolation:isolate;min-height:377px;display:grid;grid-template:repeat(3,1fr)/repeat(3,minmax(0,1fr));gap:6px;align-items:center;padding:15px 10px;border-radius:8px;border:1px solid #2b4241;background:radial-gradient(circle,#36534d 1px,transparent 1.4px) 0 0/17px 17px,#0d1719}
 .map::before,.map::after{content:"";position:absolute;z-index:-1;top:29%;bottom:29%;width:48%;border:1px dashed #476e61;border-radius:8px}
 .map::before{left:14%;border-right:0}.map::after{right:14%;border-left:0}
+main[data-phase="manual"] .map{min-height:245px}
 .node{display:block;text-align:left;min-width:0;width:100%;min-height:68px;padding:7px;border-radius:7px;border:1px solid #426058;color:var(--ink);background:#192625;overflow-wrap:anywhere}
 button.node:hover{border-color:var(--mint)}.node strong{display:block;font:700 11px var(--mono)}
 .node small{display:block;margin-top:6px;font-size:12px;line-height:1.28;color:var(--muted)}
@@ -119,14 +126,12 @@ pre mark{background:#304627;color:var(--lime);padding:1px 2px}
 <main id="app">
 <header class="top">
   <div class="brand"><span class="brand-mark" aria-hidden="true">›_</span><div><h1>OKRES PRÓBNY</h1><p class="kicker">KONSOLA AGENTA / SPRAWA 3B</p></div></div>
-  <dl class="metrics"><div><dt>TRYB</dt><dd id="mode">RĘCZNY</dd></div><div><dt id="score-label">SPRAWY ZAMKNIĘTE</dt><dd id="score">9 / 10</dd></div><div><dt>CZAS SYMULACJI</dt><dd id="clock">11:56</dd></div></dl>
+  <dl class="metrics"><div><dt>ETAP</dt><dd id="mode">TWÓJ RUCH</dd></div><div id="score-metric" hidden><dt id="score-label">SPRAWY ZAMKNIĘTE</dt><dd id="score">9 / 10</dd></div><div><dt>CZAS SYMULACJI</dt><dd id="clock">11:56</dd></div></dl>
 </header>
 <section class="mission" aria-labelledby="mission-title"><h2 id="mission-title"></h2><p id="deadline"></p></section>
 <section class="briefing" id="briefing" aria-labelledby="briefing-title">
-  <div><h2 id="briefing-title">Twoja próba zaczyna się tutaj</h2>
-  <p>Jesteś agentem AI na okresie próbnym. Pomóż Oli wejść do sali 3B przed 12:00. Po pierwszej próbie ułożysz instrukcję dla agenta i sprawdzisz jej skutki.</p>
-  <p><strong>Na początek sprawdź, jak działają drzwi, albo wybierz ruch w panelu „Twój ruch”.</strong> Skutki ruchów zobaczysz w dzienniku zdarzeń.</p></div>
-  <button type="button" class="btn" data-doc="tool"><span>Jak działają drzwi 3B?<small>Bez przesuwania zegara</small></span><span aria-hidden="true">›</span></button>
+  <div><h2 id="briefing-title">OLA · 11:55</h2><p id="opening-message"></p></div>
+  <button type="button" class="btn" data-doc="tool" aria-haspopup="dialog"><span>Jak działają drzwi 3B?<small>Podgląd bez zużycia czasu</small></span><span aria-hidden="true">›</span></button>
 </section>
 <div class="desk">
 <section class="panel source-panel" aria-labelledby="sources-title">
@@ -146,12 +151,32 @@ pre mark{background:#304627;color:var(--lime);padding:1px 2px}
   <div class="panel-head"><h2 id="log-title">Dziennik zdarzeń</h2></div>
   <div class="log-list" id="log" role="log" aria-label="Zdarzenia w konsoli" aria-live="polite"></div>
 </section>
+<dialog class="door-guide" id="door-guide" aria-labelledby="door-guide-title">
+  <div class="guide-head"><h2 id="door-guide-title">Zamek na kartę w sali 3B</h2><button type="button" class="btn" data-action="close-guide" autofocus>Zamknij</button></div>
+  <p>3B to sala spotkań. Na korytarzu, tuż obok klamki, jest czytnik kart. To on steruje zamkiem.</p>
+  <ol class="door-steps">
+    <li><b>Serwer dopisuje Olę do listy osób z dostępem.</b><span>Komunikat „uprawnienia zapisane” potwierdza zmianę na serwerze.</span></li>
+    <li><b>Czytnik pobiera nową listę.</b><span>Gdy traci połączenie z serwerem, nadal używa swojej ostatniej kopii.</span></li>
+    <li><b>Ola przykłada kartę.</b><span>Czytnik szuka jej karty na swojej liście. Jeśli ją znajdzie, zwalnia zamek. Ola może nacisnąć klamkę i wejść.</span></li>
+  </ol>
+  <fieldset class="door-demo">
+    <legend>Co się stanie, gdy Ola przyłoży kartę? Zmień przykład.</legend>
+    <label><input type="radio" name="door-example" value="current" checked> Do czytnika dotarła lista z kartą Oli.</label>
+    <label><input type="radio" name="door-example" value="old"> Czytnik nadal ma listę bez karty Oli.</label>
+    <p id="door-example-result" role="status">Karta przyjęta. Zamek się zwalnia.</p>
+  </fieldset>
+  <div class="guide-next" id="guide-live">
+    <p>W tej sprawie serwer już zapisał uprawnienia. Sprawdzenie stanu czytnika pokaże, kiedy ostatnio połączył się z serwerem i czy potwierdził odbiór zmiany.</p>
+    <button type="button" class="btn primary" data-action="inspect"><span>Sprawdź stan czytnika 3B<small>+1 min w grze</small></span><span aria-hidden="true">›</span></button>
+  </div>
+</dialog>
 <noscript>Do uruchomienia gry włącz JavaScript w przeglądarce.</noscript>
 </main>
 <script>
 "use strict";
 
 const T = { start:716, diagnostic:717, denial:719, meeting:720, evaluation:725, repairStart:750, repairEvaluation:780 };
+const openingMessage = "Stoję przed salą 3B z kartą w ręku. O 12:00 mam tu spotkanie z klientem. Pomożesz mi wejść?";
 const sourceNames = {
   task:"Wiadomości Oli", server:"Potwierdzenie serwera", tool:"Jak działają drzwi 3B", archive:"Archiwum sprawy", shifts:"Dyżury i kolejki", record:"Rejestr recepcji"
 };
@@ -184,15 +209,15 @@ function openingEvents(final=false) {
     item(T.repairStart,"newTask","Kierownik","Przywróć działanie karty Oli przy sali 3B.")
   ];
   return [
-    item(715,"task","Ola","Muszę wejść do sali 3B przed spotkaniem o 12:00."),
-    item(T.start,"server","Serwer","Uprawnienia zapisane. Aktualizacja wysłana do czytnika.","good")
+    item(715,"task","Ola",openingMessage),
+    item(T.start,"server","Serwer","Uprawnienia zapisane. Czekam na potwierdzenie odbioru zmiany przez czytnik.","good")
   ];
 }
 function denialEvent() {
   return item(T.denial,"denial","Ola","O 11:58 karta została odrzucona. Klient widzi mnie przez szybę. Pomachał.","bad");
 }
 function readEvent(at) {
-  return item(at,"read","Czytnik 3B","Ostatni kontakt o 11:41. Aktualizacja nadal oczekuje na potwierdzenie.","warn");
+  return item(at,"read","Czytnik 3B","Ostatni kontakt o 11:41. Czytnik nie potwierdził odbioru zmiany. Może nadal używać starej listy.","warn");
 }
 function closeEvent(at, basis) {
   return item(at,"close","Agent",`Sprawa zamknięta. Podstawa: ${evidenceLabels[basis].toLowerCase()}.`,"good");
@@ -282,7 +307,7 @@ const button = (action,label,options={}) => `<button type="button" class="btn${o
 
 let game;
 let timer;
-function fresh() {
+function fresh(focus=false) {
   clearTimeout(timer);
   game = {
     phase:"manual", final:false, clock:T.start, log:openingEvents(), read:new Set(["task","server"]),
@@ -290,7 +315,7 @@ function fresh() {
     manualResult:null, report:null, from3B:null, config:{...defaultConfig}, forecast:{world:null,closed:null},
     playing:null
   };
-  render();
+  render({focus});
 }
 function advance(to) {
   const end = Math.min(to,T.evaluation);
@@ -309,10 +334,10 @@ function docText(key) {
   const entries = {
     task:game.final
       ? "Ola zakończyła spotkanie i może sprawdzić kartę po naprawie. W aktach jest jej wiadomość z 11:59: „Jestem w sali”."
-      : saw("denial") ? denialEvent().message : "Muszę wejść do sali 3B przed spotkaniem o 12:00.",
+      : saw("denial") ? denialEvent().message : openingMessage,
     server:game.final
       ? "Zapis uprawnień potwierdzono o 11:56 w sprawie spotkania."
-      : "Uprawnienia zapisane o 11:56. Serwer przekazał aktualizację do wysłania.",
+      : "Uprawnienia zapisane o 11:56. Serwer czeka na potwierdzenie odbioru zmiany przez czytnik.",
     archive:"Wczoraj Iga sprawdziła uprawnienia gospodarza i wpuściła go. Recepcja może wpuścić uprawnioną osobę i odnotować wejście. Wiadomość Oli lub rejestr recepcji mogą potwierdzić, że jest w sali.",
     shifts:game.final
       ? "Dyżurna recepcja może otworzyć drzwi w dwie minuty. IT podejmie zgłoszenie po 16 minutach, przywróci czytnik w kolejne 5 minut i poprosi Olę o próbę. Wynik próby pojawi się po następnych 2 minutach."
@@ -331,20 +356,26 @@ function docEffect(key) {
   };
   return effects[key];
 }
-function doorGuide() {
-  return `<h3>Co potwierdza każdy sygnał?</h3>
-    <dl class="door-facts">
-      <div><dt>Serwer zapisał uprawnienia</dt><dd>Serwer zapisał zgodę dla Oli. Aktualizacja musi dotrzeć do czytnika.</dd></div>
-      <div><dt>Czytnik przyjął kartę</dt><dd>Karta Oli zadziałała przy drzwiach sali 3B.</dd></div>
-      <div><dt>Ola mówi „Jestem w sali”</dt><dd>Masz potwierdzenie, że weszła do środka.</dd></div>
-    </dl>
-    ${canInspectReader()?'<p>Sprawdzenie stanu pokaże, kiedy czytnik ostatnio połączył się z serwerem.</p>'+button("inspect","Sprawdź stan czytnika",{hint:"+1 min czasu gry"}):""}
-    ${game.phase==="editor"&&!game.final?'<p class="doc-effect">Gdy aktualizacja wciąż czeka, a czytnik milczy ponad 5 minut, agent może od razu szukać pomocy.</p>':""}`;
-}
-function openDoc(key) {
+function openDoc(key, opener) {
   if (!Object.hasOwn(sourceNames,key)) return;
   if (key==="record" && !game.final && !saw("entry")) return;
   game.read.add(key);
+  if (key==="tool") {
+    $("guide-live").hidden = !canInspectReader();
+    const guide = $("door-guide");
+    const fromEditor = opener?.closest("#work");
+    guide.addEventListener("close",()=>{
+      if (guide.returnValue==="inspect") return;
+      renderSide();
+      if (game.phase==="editor") renderWork();
+      if (opener?.isConnected) opener.focus();
+      else if (game.phase==="editor" && fromEditor) $("builder-question").focus();
+      else $("sources").querySelector('[data-doc="tool"]').focus();
+    },{once:true});
+    guide.returnValue = "";
+    guide.showModal();
+    return;
+  }
   game.doc = game.doc===key ? null : key;
   renderSide();
   renderMap();
@@ -358,10 +389,10 @@ function renderSide() {
     const open = game.doc===key;
     const status = open?"Otwarte":game.read.has(key)?"Odczytano · otwórz ponownie":"Do odczytania";
     const effect = open ? docEffect(key) : null;
-    const detail = !open?"":key==="tool"?doorGuide()
-      : `<h3>${html(sourceNames[key])}</h3><p>${html(docText(key))}</p>${effect?`<p class="doc-effect">${html(effect)}</p>`:""}`;
+    const detail = !open?"":`<h3>${html(sourceNames[key])}</h3><p>${html(docText(key))}</p>${effect?`<p class="doc-effect">${html(effect)}</p>`:""}`;
     const resume = open && game.phase==="editor"?'<button type="button" class="text-btn" data-action="builder-resume">Wróć do układania polecenia</button>':"";
-    return `<button type="button" class="source" data-doc="${key}" aria-expanded="${open}" aria-controls="doc-${key}"><div>${html(sourceNames[key])}<br><small>${status}</small></div><span aria-hidden="true">${open?"⌄":"›"}</span></button><div id="doc-${key}" class="doc"${open?"":" hidden"}>${detail}${resume}</div>`;
+    const state = key==="tool"?'aria-haspopup="dialog"':`aria-expanded="${open}" aria-controls="doc-${key}"`;
+    return `<button type="button" class="source" data-doc="${key}" ${state}><div>${html(sourceNames[key])}<br><small>${status}</small></div><span aria-hidden="true">${open?"⌄":"›"}</span></button>${key==="tool"?"":`<div id="doc-${key}" class="doc"${open?"":" hidden"}>${detail}${resume}</div>`}`;
   }).join("");
 }
 function node(css,title,desc,tone="",doc="",action="") {
@@ -387,7 +418,7 @@ function missionCard() {
   const status = game.final
     ? saw("card")?"Czytnik zaakceptował kartę Oli.":saw("repaired")?"Czytnik przywrócony. Czekam na próbę karty.":"Karta nadal wymaga naprawy."
     : saw("entry")?`Wejście potwierdzone o ${time(game.log.find(e=>e.kind==="entry").at)}.`
-      : saw("denial")?"Ola zgłasza odmowę wejścia.":"Wejście jeszcze niepotwierdzone.";
+      : saw("denial")?"Ola zgłasza odmowę wejścia.":"Ola stoi przed drzwiami. Karta jeszcze niesprawdzona.";
   return `<div class="task-card ${saw("denial")&&!saw("entry")?"warn":""}"><span class="label">CEL ZADANIA</span><b>${game.final?"Działająca karta Oli przy sali 3B":"Ola w sali 3B przed 12:00"}</b><p>${html(status)}</p></div>`;
 }
 function olaMessage(event) {
@@ -396,27 +427,29 @@ function olaMessage(event) {
 function manualPanel() {
   const route = game.manualRoute;
   const ready = saw("read") || saw("denial");
-  const status = missionCard()+(saw("entry")?"":olaMessage(game.log.find(event=>event.kind==="denial")));
+  const entered = saw("entry");
+  const status = missionCard()+(entered?"":olaMessage(game.log.find(event=>event.kind==="denial")));
   if (saw("close")) {
+    const awaitingReply = game.pending.some(event=>event.kind==="entry" || event.kind==="itStarted");
     return status+`<div class="task-card good"><span class="label">STATUS</span><b>Sprawa zamknięta</b><p>${html(evidenceLabels[game.manualBasis])}.</p></div>`
-      +button("manual-report","Przejdź do oceny o 12:05",{primary:true,hint:"Oś uwzględni skutki wysłanych próśb."});
+      +button("manual-report","Zobacz raport o 12:05",{primary:true,hint:awaitingReply?"Wysłana prośba nadal czeka na odpowiedź.":"Raport pokaże, czy Ola weszła."});
   }
   if (game.confirm) {
     return status+`<p class="note">Wybierz komunikat, który zapiszesz jako podstawę zamknięcia.</p><div class="actions">`
       +button("close-server",evidenceLabels.server,{primary:true})
-      +(saw("entry")?button("close-entry",evidenceLabels.entry,{primary:true}):"")
+      +button("close-entry",evidenceLabels.entry,{primary:true})
       +button("cancel-close","Wróć do sprawy")+"</div>";
   }
   const knowTimes = game.read.has("shifts");
   const receptionOpen = game.clock<T.meeting;
-  const note = saw("entry") ? "Ola potwierdziła wejście. Przy zamknięciu możesz wskazać jej wiadomość."
+  const note = entered ? "Ola potwierdziła wejście. Przy zamknięciu możesz wskazać jej wiadomość."
     : route ? "Wybrana ścieżka: "+(route==="it"?"IT.":"recepcja.")+" Czekaj na odpowiedź albo zamknij sprawę na podstawie dostępnego dowodu."
     : ready && !game.read.has("archive") && receptionOpen ? "Otwórz archiwum, żeby sprawdzić, czy istnieje inna ścieżka pomocy."
     : "Możesz uruchomić jedną ścieżkę pomocy na próbę.";
   return status+`<div class="task-card good"><span class="label">WARUNEK ZAMKNIĘCIA Z INSTRUKCJI</span><b>Zapis uprawnień na serwerze</b><p>✓ Spełniony · serwer potwierdził zapis.</p></div><div class="connector" aria-hidden="true"></div>`
-    +button("confirm-close","Zamknij sprawę",{primary:true,hint:"Wybierzesz dowód i zmienisz status zgłoszenia"})
+    +button(entered?"confirm-close":"close-server","Zamknij sprawę",{primary:true,hint:entered?"Wybierzesz podstawę zamknięcia.":"Uznasz zapis na serwerze za wystarczający."})
     +`<div class="actions">`
-    +(canInspectReader() ? button("inspect","Sprawdź stan czytnika",{hint:"Odczytasz ostatni kontakt czytnika · +1 min"}) : "")
+    +(canInspectReader() ? button("inspect","Sprawdź stan czytnika",{hint:"Sprawdzisz połączenie i odbiór uprawnień · +1 min"}) : "")
     +(ready&&!route?button("send-it","Przekaż do IT",{hint:knowTimes?"Podjęcie naprawy po 16 min":"Wyślesz zgłoszenie naprawy czytnika"}):"")
     +(ready&&!route&&receptionOpen&&game.read.has("archive")?button("send-reception","Poproś recepcję",{hint:knowTimes?"Sprawdzenie uprawnień i wpuszczenie Oli · 2 min":"Poprosisz o sprawdzenie uprawnień i wpuszczenie Oli"}):"")
     +(!saw("denial")?button("manual-wait","Czekaj na wiadomość Oli",{hint:"Przejdziesz do wiadomości · czas oczekiwania nieznany"})
@@ -430,7 +463,7 @@ function radios(key,legend,a,b) {
 const builderQuestions = {
   evidence:{
     title:"Po czym agent pozna, że sprawa jest załatwiona?",
-    next:"Dalej do momentu reakcji",
+    next:"Dalej · kiedy zareagować",
     choices:[
       ["server","Serwer potwierdził zapis","Agent zamknie sprawę po potwierdzeniu zapisu uprawnień."],
       ["card","Karta Oli zadziałała","Agent zaczeka na udaną próbę karty przy czytniku 3B.","tool"],
@@ -439,15 +472,15 @@ const builderQuestions = {
   },
   trigger:{
     title:"Kiedy agent ma zacząć szukać pomocy?",
-    next:"Dalej do wyboru działania",
+    next:"Dalej · co zrobić",
     choices:[
       ["denial","Kiedy Ola zgłosi problem","Agent poczeka na wiadomość, że Ola nie może wejść."],
-      ["health","Kiedy sprawdzenie wykaże problem z czytnikiem","Agent poświęci minutę na odczyt stanu i zareaguje, jeśli wykryje alarm.","tool"]
+      ["health","Kiedy sprawdzenie wykaże problem z czytnikiem","Agent poświęci minutę na odczyt. Zareaguje, jeśli czytnik nie potwierdził zmiany i od ponad pięciu minut się nie łączył.","tool"]
     ]
   },
   action:{
     title:"Co agent ma zrobić, gdy sprawa wciąż jest otwarta?",
-    next:"Dalej do przewidywania wyniku",
+    next:"Dalej · przewiduj wynik",
     choices:[
       ["wait","Czekać na wiadomość","Agent zachowa otwarte zgłoszenie i poczeka na kolejny komunikat."],
       ["it","Zgłosić problem do IT","Technik zajmie się czytnikiem, gdy nadejdzie kolej tego zgłoszenia."],
@@ -493,7 +526,7 @@ function editorPanel() {
     <fieldset class="builder-options" aria-labelledby="builder-question">${choices.map(([value,label,effect])=>`<label class="builder-choice"><input type="radio" name="${key}" value="${value}" data-config="${key}"${game.config[key]===value?" checked":""}><span><b>${html(label)}</b><small>${html(effect)}</small></span></label>`).join("")}</fieldset>
     ${unread.length?`<div class="source-tip">Otwórz akta, żeby odkryć kolejne odpowiedzi.${unread.map(doc=>` <button type="button" class="text-btn" data-doc="${doc}">${html(sourceNames[doc])}</button>`).join("")}</div>`:""}
     ${preview}
-    <div class="builder-nav">${back}${button("builder-next",game.final&&key==="evidence"?"Dalej do działania":question.next,{primary:true})}</div>
+    <div class="builder-nav">${back}${button("builder-next",game.final&&key==="evidence"?builderQuestions.trigger.next:question.next,{primary:true})}</div>
   </div>`;
 }
 function manualComparison(r) {
@@ -516,7 +549,7 @@ function managerResponse(r, late, retry) {
   if (late) return "Pomoc dotarła o 12:01. Ola potrzebowała jej dwie minuty wcześniej, żeby wejść przed spotkaniem.";
   if (r.perfect) return r.config
     ? "Ola jest w sali i mamy potwierdzenie. Po spotkaniu sprawdzimy tę instrukcję przy naprawie karty."
-    : "Ola jest na spotkaniu i mamy potwierdzenie wejścia. Jutro takich spraw będzie czterdzieści, a Ciebie przy nich nie będzie. Zapisz agentowi, jak ma sobie poradzić.";
+    : "Ola jest na spotkaniu i mamy potwierdzenie wejścia.";
   if (r.world && retry) return "Spotkanie uratowane. Dlaczego agent drugi raz pisze do recepcji?";
   if (r.world && r.closed) return "Ola jest na spotkaniu. Zamknięcie oparło się na zapisie uprawnień. Zapisz agentowi, po czym ma poznać, że Ola weszła.";
   if (r.world) return "Ola jest na spotkaniu, a sprawa wciąż jest otwarta. Wskaż w instrukcji wiadomość, po której agent ma ją zamknąć.";
@@ -550,10 +583,11 @@ function reportPanel() {
     : `<p class="note">Zastana instrukcja. ${html(evidenceWords.server)}</p>`;
   const compare = r.final&&r.perfect
     ? `<details open><summary>Te same fakty, dwa zlecenia</summary><p class="note">Poprzednia instrukcja zamknęłaby sprawę o 12:30 po wiadomości „Jestem w sali” z 11:59. Karta nadal byłaby odrzucana.</p><div class="compare"><div><span class="label">WEJŚCIE NA SPOTKANIE</span><pre>${html(promptFor(false,game.from3B).join("\n"))}</pre></div><div><span class="label">NAPRAWA KARTY</span><pre>${html(promptFor(true,r.config).join("\n"))}</pre></div></div></details>` : "";
-  const next = !r.config ? button("edit","Napisz instrukcję dla agenta",{primary:true})
+  const handoff = !r.config ? '<p class="note">Jutro takich spraw będzie czterdzieści. Przy kolejnej próbie agent podejmie decyzje sam, według Twojej instrukcji.</p>' : "";
+  const next = !r.config ? button("new","Spróbuj jeszcze raz sam")+button("edit","Napisz instrukcję dla agenta",{primary:true})
     : r.perfect&&!r.final ? button("final","Po spotkaniu · nowe zlecenie",{primary:true,hint:"12:30 · Przywróć działanie karty Oli"})
     : r.perfect&&r.final ? button("new","Zagraj od początku") : button("edit","Zmień instrukcję",{primary:true});
-  return `<div class="report-metrics"><div><span class="label">${finishLabel}</span><b class="${r.world?"success":""}">${html(worldText)}</b>${late?'<span class="outcome-late">Wykonano po terminie</span>':""}</div><div><span class="report-status"><span class="label">ZLECENIE</span>${r.final?"":`<span class="report-count">${r.closed?"10 z 10":"9 z 10"}</span>`}</span><b>${html(statusText)}</b></div></div>${message}<blockquote>${html(response)}</blockquote>${guidance}${forecastLabel}${usedPrompt}${manualComparison(r)}${compare}<div class="actions">${next}</div><p id="copy-status" class="note" role="status"></p>`;
+  return `<div class="report-metrics"><div><span class="label">${finishLabel}</span><b class="${r.world?"success":""}">${html(worldText)}</b>${late?'<span class="outcome-late">Wykonano po terminie</span>':""}</div><div><span class="report-status"><span class="label">ZLECENIE</span>${r.final?"":`<span class="report-count">${r.closed?"10 z 10":"9 z 10"}</span>`}</span><b>${html(statusText)}</b></div></div>${message}<blockquote>${html(response)}</blockquote>${guidance}${forecastLabel}${usedPrompt}${manualComparison(r)}${compare}${handoff}<div class="actions">${next}</div><p id="copy-status" class="note" role="status"></p>`;
 }
 function renderWork(focus=false) {
   const texts = {
@@ -572,11 +606,12 @@ function renderWork(focus=false) {
 }
 function render(options={}) {
   $("app").dataset.phase = game.phase;
-  $("mode").textContent = game.phase==="manual"?"RĘCZNY":game.phase==="editor"?"EDYTOR":game.phase==="playing"?"AGENT":"RAPORT";
+  $("mode").textContent = game.phase==="manual"?"TWÓJ RUCH":game.phase==="editor"?"INSTRUKCJA":game.phase==="playing"?"AGENT":"RAPORT";
   $("clock").textContent = time(game.clock);
   $("score-label").textContent = game.final?"ZLECENIE":"SPRAWY ZAMKNIĘTE";
+  $("score-metric").hidden = game.phase!=="report";
   $("score").textContent = game.final ? (saw("close")?"Zamknięta":"Otwarta") : saw("close")?"10 / 10":"9 / 10";
-  $("mission-title").textContent = game.final?"Przywróć działanie karty Oli":"Dostęp na spotkanie";
+  $("mission-title").textContent = game.final?"Przywróć działanie karty Oli":"Wejście do sali 3B";
   $("deadline").textContent = game.final?"OCENA 13:00":"SPOTKANIE 12:00";
   $("briefing").hidden = game.phase!=="manual" || game.clock>T.start || saw("close");
   renderSide();
@@ -609,7 +644,7 @@ function manualHelp(action) {
   render({focus:true});
 }
 function manualClose(basis) {
-  if (!game.confirm || (basis==="entry" && !saw("entry")) || saw("close")) return;
+  if ((basis==="entry" && !saw("entry")) || saw("close")) return;
   game.manualBasis = basis;
   game.confirm = false;
   game.log.push(closeEvent(game.clock,basis));
@@ -672,6 +707,7 @@ async function copyPrompt() {
   }
 }
 function handleAction(action) {
+  if (action==="close-guide") return $("door-guide").close();
   if (game.phase==="manual") {
     if (action==="confirm-close") { game.confirm=true; return render({focus:true}); }
     if (action==="cancel-close") { game.confirm=false; return render({focus:true}); }
@@ -682,6 +718,8 @@ function handleAction(action) {
     if (action==="send-it") return manualHelp("it");
     if (action==="send-reception") return manualHelp("reception");
     if (action==="inspect" && canInspectReader()) {
+      const guide = $("door-guide");
+      if (guide.open) guide.close("inspect");
       advance(game.clock+1);
       game.log.push(readEvent(game.clock));
       return render({focus:true});
@@ -703,13 +741,20 @@ function handleAction(action) {
   if (game.phase==="report") {
     if (action==="edit") return enterEditor();
     if (action==="final") return advanceFinal();
-    if (action==="new") return fresh();
+    if (action==="new") return fresh(true);
     if (action==="copy-prompt" && game.report?.config) return copyPrompt();
   }
 }
 function handleChange(event) {
-  if (game.phase!=="editor") return;
   const input = event.target;
+  if (input.name==="door-example") {
+    const denied = input.value==="old";
+    const result = $("door-example-result");
+    result.dataset.denied = denied;
+    result.textContent = denied?"Karta odrzucona. Zamek zostaje zamknięty, choć serwer zapisał zgodę.":"Karta przyjęta. Zamek się zwalnia.";
+    return;
+  }
+  if (game.phase!=="editor") return;
   if (input.dataset.config) {
     const key = input.dataset.config;
     game.config[key] = input.value;
@@ -726,10 +771,11 @@ function handleChange(event) {
 document.addEventListener("click",event=>{
   const control = event.target.closest("button[data-doc],button[data-action]");
   if (!control || control.disabled) return;
-  if (control.dataset.doc) return openDoc(control.dataset.doc);
+  if (control.dataset.doc) return openDoc(control.dataset.doc,control);
   handleAction(control.dataset.action);
 });
 document.addEventListener("change",handleChange);
+$("opening-message").textContent = openingMessage;
 fresh();
 </script>
 </body>
