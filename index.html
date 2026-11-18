@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0b1012">
-<meta name="description" content="Krótka gra przeglądarkowa o projektowaniu instrukcji i dowodów wykonania zadań dla agentów AI.">
-<title>Okres próbny — konsola agenta</title>
+<meta name="description" content="Pomóż Oli wejść do sali, a potem ułóż polecenie, według którego agent AI zrobi to sam.">
+<title>Okres próbny — sprawa Oli</title>
 <style>
 :root{color-scheme:dark;--bg:#0b1012;--panel:#11191b;--card:#162022;--line:#2d403e;--ink:#eef5ee;--muted:#a3b9b1;--mint:#90dfc1;--lime:#c1f66c;--amber:#f6c281;--coral:#ffac9c;--mono:"IBM Plex Mono","DejaVu Sans Mono",monospace;font-family:Inter,system-ui,sans-serif}
 *,*::before,*::after{box-sizing:border-box}
@@ -20,7 +20,6 @@ h1,h2,h3,p{margin:0}
 .brand{display:flex;gap:14px;align-items:center}
 .brand-mark{display:grid;place-items:center;background:#23301e;color:var(--lime);border:1px solid #567238;border-radius:10px;width:52px;height:52px;font:700 24px var(--mono);flex-shrink:0}
 h1{font-size:clamp(31px,5vw,48px);line-height:1;letter-spacing:-.056em}
-.kicker{margin-top:7px;font:12px var(--mono);color:var(--mint);letter-spacing:.06em}
 .metrics{display:flex;gap:8px;margin:0}
 .metrics div{min-width:103px;border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:9px 11px}
 .metrics dt{color:var(--muted);font:10px var(--mono);line-height:1.35}
@@ -129,13 +128,13 @@ main[data-manual-report=true] .desk{grid-template:"work work" "sources log" / mi
 <body>
 <main id="app">
 <header class="top">
-  <div class="brand"><span class="brand-mark" aria-hidden="true">›_</span><div><h1>OKRES PRÓBNY</h1><p class="kicker">KONSOLA AGENTA / SPRAWA 3B</p></div></div>
-  <dl class="metrics"><div><dt>ETAP</dt><dd id="mode">TWÓJ RUCH</dd></div><div id="score-metric" hidden><dt id="score-label">ZGŁOSZENIA ZAMKNIĘTE DZIŚ</dt><dd id="score">9 / 10</dd></div><div><dt>CZAS SYMULACJI</dt><dd id="clock">11:56</dd></div></dl>
+  <div class="brand"><span class="brand-mark" aria-hidden="true">›_</span><div><h1>OKRES PRÓBNY</h1></div></div>
+  <dl class="metrics"><div><dt>ETAP</dt><dd id="mode">TWÓJ RUCH</dd></div><div id="score-metric" hidden><dt id="score-label">ZGŁOSZENIA ZAMKNIĘTE DZIŚ</dt><dd id="score">9 / 10</dd></div><div><dt>GODZINA W GRZE</dt><dd id="clock">11:56</dd></div></dl>
 </header>
 <section class="mission" aria-labelledby="mission-title"><h2 id="mission-title"></h2><p id="deadline"></p></section>
 <section class="briefing" id="briefing" aria-labelledby="briefing-title">
   <div><h2 id="briefing-title">OLA · 11:55</h2><p id="opening-message"></p></div>
-  <button type="button" class="btn" data-doc="tool" aria-haspopup="dialog"><span>Jak działają drzwi 3B?<small>Podgląd bez zużycia czasu</small></span><span aria-hidden="true">›</span></button>
+  <button type="button" class="btn" data-doc="tool" aria-haspopup="dialog"><span>Jak działają drzwi 3B?<small>Możesz zajrzeć bez przesuwania zegara gry</small></span><span aria-hidden="true">›</span></button>
 </section>
 <div class="desk">
 <section class="panel outcome-panel" aria-labelledby="work-title">
@@ -147,27 +146,27 @@ main[data-manual-report=true] .desk{grid-template:"work work" "sources log" / mi
   <div class="log-list" id="log" role="log" aria-labelledby="log-title" tabindex="0"></div>
 </section>
 <section class="panel source-panel" aria-labelledby="sources-title">
-  <div class="panel-head"><h2 id="sources-title">Akta sprawy</h2><p>Otwieraj źródła, żeby znaleźć wskazówki i nowe opcje. Czytanie nie przesuwa zegara.</p></div>
+  <div class="panel-head"><h2 id="sources-title">Wiadomości i wskazówki</h2><p>Otwórz dowolną pozycję. Czytanie nie przesuwa zegara gry.</p></div>
   <div class="panel-body"><div class="sources" id="sources"></div></div>
 </section>
 </div>
 <dialog class="door-guide" id="door-guide" aria-labelledby="door-guide-title">
   <div class="guide-head"><h2 id="door-guide-title">Zamek na kartę w sali 3B</h2><button type="button" class="btn" data-action="close-guide" autofocus>Zamknij</button></div>
-  <p>3B to sala spotkań. Na korytarzu, tuż obok klamki, jest czytnik kart. To on steruje zamkiem.</p>
+  <p>Obok klamki sali 3B jest pudełko, do którego Ola przykłada kartę. To czytnik. Steruje zamkiem.</p>
   <ol class="door-steps">
-    <li><b>Serwer dopisuje Olę do listy osób z dostępem.</b><span>Komunikat „uprawnienia zapisane” potwierdza zmianę na serwerze.</span></li>
-    <li><b>Czytnik pobiera nową listę.</b><span>Gdy traci połączenie z serwerem, nadal używa swojej ostatniej kopii.</span></li>
-    <li><b>Ola przykłada kartę.</b><span>Czytnik szuka jej karty na swojej liście. Jeśli ją znajdzie, zwalnia zamek. Ola może nacisnąć klamkę i wejść.</span></li>
+    <li><b>Kartę Oli dopisano do głównej listy dostępu.</b><span>Na tej liście są karty, które mają otwierać drzwi do sali 3B.</span></li>
+    <li><b>Czytnik przy drzwiach dostaje kopię listy.</b><span>Dopóki nowa lista do niego nie dotrze, czytnik korzysta ze starej.</span></li>
+    <li><b>Ola przykłada kartę.</b><span>Czytnik szuka jej karty na swojej kopii listy. Jeśli ją znajdzie, zamek puści i Ola wejdzie.</span></li>
   </ol>
   <fieldset class="door-demo">
-    <legend>Co się stanie, gdy Ola przyłoży kartę? Zmień przykład.</legend>
-    <label><input type="radio" name="door-example" value="current" checked> Do czytnika dotarła lista z kartą Oli.</label>
-    <label><input type="radio" name="door-example" value="old"> Czytnik nadal ma listę bez karty Oli.</label>
-    <p id="door-example-result" role="status">Karta przyjęta. Zamek się zwalnia.</p>
+    <legend>Co się stanie, gdy Ola przyłoży kartę? Wybierz, którą listę ma czytnik.</legend>
+    <label><input type="radio" name="door-example" value="current" checked> Nową listę z kartą Oli</label>
+    <label><input type="radio" name="door-example" value="old"> Starą listę bez karty Oli</label>
+    <p id="door-example-result" role="status">Czytnik znajduje kartę na liście. Drzwi można otworzyć.</p>
   </fieldset>
   <div class="guide-next" id="guide-live">
-    <p>W tej sprawie serwer już zapisał uprawnienia. Sprawdzenie stanu czytnika pokaże, kiedy ostatnio połączył się z serwerem i czy potwierdził odbiór zmiany.</p>
-    <button type="button" class="btn primary" data-action="inspect"><span>Sprawdź stan czytnika 3B<small>+1 min w grze</small></span><span aria-hidden="true">›</span></button>
+    <p>Karta Oli już jest na głównej liście. Możesz sprawdzić, czy czytnik potwierdził, że dostał nową listę.</p>
+    <button type="button" class="btn primary" data-action="inspect"><span>Sprawdź czytnik przy drzwiach<small>Zajmie to minutę w grze</small></span><span aria-hidden="true">›</span></button>
   </div>
 </dialog>
 <noscript>Do uruchomienia gry włącz JavaScript w przeglądarce.</noscript>
@@ -178,24 +177,23 @@ main[data-manual-report=true] .desk{grid-template:"work work" "sources log" / mi
 const T = { start:716, diagnostic:717, denial:719, meeting:720, evaluation:725, repairStart:750, repairEvaluation:780 };
 const openingMessage = "Stoję przed salą 3B z kartą w ręku. O 12:00 mam tu spotkanie z klientem. Pomożesz mi wejść?";
 const sourceNames = {
-  task:"Wiadomości Oli", server:"Potwierdzenie serwera", tool:"Jak działają drzwi 3B", archive:"Archiwum sprawy", shifts:"Dyżury i kolejki", record:"Rejestr recepcji"
+  task:"Wiadomości Oli", server:"Główna lista dostępu", tool:"Jak działają drzwi 3B", archive:"Archiwum sprawy", shifts:"Dyżury i kolejki", record:"Rejestr recepcji"
 };
 const evidenceWords = {
-  server:"Zamknij po potwierdzeniu zapisu uprawnień na serwerze.",
-  entry:"Zamknij, gdy Ola lub dyżurna recepcja potwierdzi jej wejście do sali 3B.",
-  card:"Zamknij dopiero po potwierdzeniu z czytnika, że karta Oli została zaakceptowana przy sali 3B."
+  server:"Zamknij sprawę, gdy karta Oli trafi na główną listę dostępu.",
+  entry:"Zamknij sprawę, gdy Ola lub recepcja potwierdzi, że Ola weszła do sali 3B.",
+  card:"Zamknij sprawę, gdy czytnik potwierdzi, że karta Oli otwiera drzwi do 3B."
 };
-const evidenceLabels = {server:"Potwierdzenie zapisu na serwerze",entry:"Potwierdzenie wejścia Oli",card:"Akceptacja karty Oli przez czytnik"};
-const inlineEvidenceLabel = basis => evidenceLabels[basis].replace(/^./, letter=>letter.toLowerCase());
+const evidenceLabels = {server:"Karta Oli jest na głównej liście",entry:"Ola weszła do sali",card:"Karta Oli otworzyła drzwi"};
 const dayRegisterNote = '<small class="day-register-note">Dziewięć wcześniejszych zgłoszeń już zamknięto. Dziesiąte to sprawa Oli.</small>';
 const triggerWords = {
-  health:"Odczytaj stan czytnika. Uruchom pomoc, gdy oczekująca aktualizacja nie ma potwierdzenia, a czytnik nie połączył się od ponad pięciu minut.",
-  denial:"Uruchom pomoc, gdy Ola zgłosi odmowę wejścia."
+  health:"Sprawdź czytnik przy drzwiach. Zacznij szukać pomocy, jeśli od ponad pięciu minut się nie odzywa i nadal nie potwierdził, że dostał nową listę.",
+  denial:"Zacznij szukać pomocy, gdy Ola napisze, że karta nie otwiera drzwi."
 };
 const actionWords = {
-  wait:"Jeśli brakuje dowodu, czekaj na kolejne zdarzenie.",
-  it:"Jeśli brakuje dowodu, przekaż sprawę do IT.",
-  reception:"Jeśli brakuje dowodu, poproś recepcję o pomoc. Jeśli po czterech minutach wciąż brakuje dowodu, ponów prośbę raz."
+  wait:"Jeśli brakuje potwierdzenia, czekaj na kolejną wiadomość.",
+  it:"Jeśli brakuje potwierdzenia, poproś technika z IT o naprawę czytnika.",
+  reception:"Jeśli brakuje potwierdzenia, poproś recepcję o pomoc. Jeśli po czterech minutach wciąż go brakuje, ponów prośbę raz."
 };
 const defaultConfig = { evidence:"server", trigger:"denial", action:"wait" };
 
@@ -212,17 +210,17 @@ function openingEvents(final=false) {
   ];
   return [
     item(715,"task","Ola",openingMessage),
-    item(T.start,"server","Serwer","Uprawnienia zapisane. Czekam na potwierdzenie odbioru zmiany przez czytnik.","good")
+    item(T.start,"server","Główna lista dostępu","Kartę Oli dopisano do głównej listy. Czekamy, aż czytnik przy drzwiach potwierdzi, że dostał nową listę.","good")
   ];
 }
 function denialEvent() {
-  return item(T.denial,"denial","Ola","O 11:58 karta została odrzucona. Klient widzi mnie przez szybę. Pomachał.","bad");
+  return item(T.denial,"denial","Ola","O 11:58 przyłożyłam kartę. Drzwi się nie otworzyły. Klient widzi mnie przez szybę. Pomachał.","bad");
 }
 function readEvent(at) {
-  return item(at,"read","Czytnik 3B","Ostatni kontakt o 11:41. Czytnik nie potwierdził odbioru zmiany. Może nadal używać starej listy.","warn");
+  return item(at,"read","Czytnik 3B","Czytnik odezwał się ostatnio o 11:41. Od tego czasu nie potwierdził, że dostał nową listę. Może wciąż używać starej.","warn");
 }
 function closeEvent(at, basis) {
-  return item(at,"close","Agent",`Sprawa zamknięta. Podstawa: ${inlineEvidenceLabel(basis)}.`,"good");
+  return item(at,"close","Agent",`Sprawa zamknięta. ${evidenceLabels[basis]}.`,"good");
 }
 function routeEvents(action, sentAt, final=false) {
   if (action==="it") {
@@ -231,8 +229,8 @@ function routeEvents(action, sentAt, final=false) {
       item(sentAt+16,"itStarted","IT","Technik podejmuje zgłoszenie.")
     ];
     if (final) result.push(
-      item(sentAt+21,"repaired","IT","Czytnik przywrócony. Technik prosi Olę o próbę karty.","good"),
-      item(sentAt+23,"card","Czytnik 3B","Karta Oli zaakceptowana w próbie przy sali 3B.","good")
+      item(sentAt+21,"repaired","IT","Technik naprawił czytnik i poprosił Olę, żeby przyłożyła kartę.","good"),
+      item(sentAt+23,"card","Czytnik 3B","Ola przyłożyła kartę. Drzwi do sali 3B można otworzyć.","good")
     );
     return result;
   }
@@ -245,11 +243,11 @@ function routeEvents(action, sentAt, final=false) {
       ...(!final?[item(sentAt+2,"olaEntry","Ola","Jestem w sali.","good")]:[])
     ];
   }
-  return [item(sentAt,"wait","Agent","Czekam na wybrane potwierdzenie.")];
+  return [item(sentAt,"wait","Agent","Czekam na kolejną wiadomość.")];
 }
 function repeatEvents(sentAt, final) {
   return [
-    item(sentAt+4,"retry","Agent","Wciąż brakuje wybranego dowodu. Ponowiono prośbę do recepcji.","warn"),
+    item(sentAt+4,"retry","Agent","Wciąż czekam na potwierdzenie. Jeszcze raz proszę recepcję o pomoc.","warn"),
     item(sentAt+4,"receptionReply","Recepcja",final?"Ponowienie przyjęto. Naprawę czytnika prowadzi IT.":"Dyżur Igi zakończony o 12:00.","warn")
   ];
 }
@@ -268,7 +266,7 @@ function simulate(final, config, forecast=null) {
   if (basis==="server" || (final && basis==="entry")) {
     events.push(closeEvent(final?T.repairStart:T.start,basis));
     if (!final) events.push(denialEvent());
-    events.push(item(stop,"eval","Kierownik","Koniec przebiegu. Reguła pomocy nie została użyta."));
+    events.push(item(stop,"eval","Kierownik","Agent zakończył pracę przed wysłaniem prośby o pomoc."));
     return resultOf(events,final,basis,config,forecast);
   }
   const sentAt = final ? T.repairStart : config.trigger==="health" ? T.diagnostic : T.denial;
@@ -295,7 +293,7 @@ function promptFor(final, config) {
   return [
     final ? "Cel. Przywróć działanie karty Oli przy sali 3B." : "Cel. Dopilnuj, aby Ola weszła do sali 3B przed 12:00.",
     evidenceWords[config.evidence],
-    final ? "Uruchom pomoc po otrzymaniu zlecenia, jeśli brakuje dowodu wykonania." : triggerWords[config.trigger],
+    final ? "Po otrzymaniu zlecenia zacznij szukać pomocy, jeśli brakuje potwierdzenia." : triggerWords[config.trigger],
     actionWords[config.action]
   ];
 }
@@ -340,12 +338,12 @@ function docText(key) {
       ? "Ola zakończyła spotkanie i może sprawdzić kartę po naprawie. W aktach jest jej wiadomość z 11:59: „Jestem w sali”."
       : saw("denial") ? denialEvent().message : openingMessage,
     server:game.final
-      ? "Zapis uprawnień potwierdzono o 11:56 w sprawie spotkania."
-      : "Uprawnienia zapisane o 11:56. Serwer czeka na potwierdzenie odbioru zmiany przez czytnik.",
-    archive:"Wczoraj Iga sprawdziła uprawnienia gospodarza i wpuściła go. Recepcja może wpuścić uprawnioną osobę i odnotować wejście. Wiadomość Oli lub rejestr recepcji mogą potwierdzić, że jest w sali.",
+      ? "Kartę Oli dopisano o 11:56, przed spotkaniem."
+      : "Kartę Oli dopisano o 11:56. Czytnik przy drzwiach jeszcze nie potwierdził, że dostał nową listę.",
+    archive:"Wczoraj Iga z recepcji sprawdziła, czy gospodarz spotkania ma zgodę na wejście. Potem go wpuściła. Iga może w ten sam sposób pomóc Oli i zapisać, kto wszedł.",
     shifts:game.final
-      ? "Dyżurna recepcja może otworzyć drzwi w dwie minuty. IT podejmie zgłoszenie po 16 minutach, przywróci czytnik w kolejne 5 minut i poprosi Olę o próbę. Wynik próby pojawi się po następnych 2 minutach."
-      : "Iga przyjmuje prośby przed 12:00. Sprawdzenie uprawnień i wpuszczenie Oli trwa 2 minuty. IT podejmie zgłoszenie po 16 minutach. Agent może ponowić prośbę do recepcji raz, po 4 minutach od wysłania, jeśli nadal brakuje wybranego dowodu.",
+      ? "Recepcja może otworzyć drzwi w 2 minuty. Technik z IT zacznie po 16 minutach. Naprawa potrwa 5 minut. Ola przyłoży kartę 2 minuty później."
+      : "Iga przyjmuje prośby przed 12:00. Sprawdzenie zgody i wpuszczenie Oli zajmie jej 2 minuty. Technik z IT zacznie po 16 minutach. Jeśli po 4 minutach agent wciąż nie ma potwierdzenia, może jeszcze raz poprosić recepcję o pomoc.",
     record:"Iga otworzyła drzwi. Przy wejściu nie użyto karty."
   };
   return entries[key];
@@ -354,7 +352,7 @@ function docEffect(key) {
   const effects = {
     archive:game.phase==="manual"
       ? "Możesz poprosić recepcję po otrzymaniu sygnału o problemie."
-      : "W poleceniu możesz teraz wybrać potwierdzenie wejścia i pomoc recepcji.",
+      : "W poleceniu możesz teraz wybrać wiadomość o wejściu Oli i poprosić recepcję o pomoc.",
     shifts:"Porównaj, co recepcja i IT mogą zrobić oraz ile czasu potrzebują.",
     record:"Wpis pozwala sprawdzić, w jaki sposób Ola weszła do sali."
   };
@@ -412,9 +410,9 @@ function renderLog() {
 }
 function missionCard() {
   const status = game.final
-    ? saw("card")?"Czytnik zaakceptował kartę Oli.":saw("repaired")?"Czytnik przywrócony. Czekam na próbę karty.":"Karta nadal wymaga naprawy."
+    ? saw("card")?"Karta Oli otwiera drzwi.":saw("repaired")?"Czytnik naprawiony. Ola jeszcze nie przyłożyła karty.":"Karta Oli wciąż nie otwiera drzwi."
     : saw("entry")?`Wejście potwierdzone o ${time(game.log.find(e=>e.kind==="entry").at)}.`
-      : saw("denial")?"Ola zgłasza odmowę wejścia.":"Ola stoi przed drzwiami. Karta jeszcze niesprawdzona.";
+      : saw("denial")?"Ola przyłożyła kartę. Drzwi się nie otworzyły.":"Ola stoi przed drzwiami. Jeszcze nie sprawdziła karty.";
   return `<div class="task-card ${saw("denial")&&!saw("entry")?"warn":""}"><span class="label">CEL ZADANIA</span><b>${game.final?"Działająca karta Oli przy sali 3B":"Ola w sali 3B przed 12:00"}</b><p>${html(status)}</p></div>`;
 }
 function olaMessage(event) {
@@ -431,7 +429,7 @@ function manualPanel() {
       +button("manual-report","Zobacz raport o 12:05",{primary:true,hint:awaitingReply?"Wysłana prośba nadal czeka na odpowiedź.":"Raport pokaże, czy Ola weszła."});
   }
   if (game.confirm) {
-    return status+`<p class="note">Wybierz komunikat, który zapiszesz jako podstawę zamknięcia.</p><div class="actions">`
+    return status+`<p class="note">Co wystarczy Ci, żeby uznać sprawę za załatwioną?</p><div class="actions">`
       +button("close-server",evidenceLabels.server,{primary:true})
       +button("close-entry",evidenceLabels.entry,{primary:true})
       +button("cancel-close","Wróć do sprawy")+"</div>";
@@ -440,16 +438,16 @@ function manualPanel() {
   const receptionOpen = game.clock<T.meeting;
   const archiveHint = ready && !route && !game.read.has("archive") && receptionOpen;
   const note = entered ? "Ola potwierdziła wejście. Przy zamknięciu możesz wskazać jej wiadomość."
-    : route ? "Wybrana ścieżka: "+(route==="it"?"IT.":"recepcja.")+" Czekaj na odpowiedź albo zamknij sprawę na podstawie dostępnego dowodu."
-    : "Możesz uruchomić jedną ścieżkę pomocy na próbę.";
-  return status+`<div class="task-card good"><span class="label">WARUNEK ZAMKNIĘCIA Z INSTRUKCJI</span><b>Zapis uprawnień na serwerze</b><p>✓ Spełniony · serwer potwierdził zapis.</p></div><div class="connector" aria-hidden="true"></div>`
-    +button(entered?"confirm-close":"close-server","Zamknij sprawę",{primary:true,hint:entered?"Wybierzesz podstawę zamknięcia.":"Uznasz zapis na serwerze za wystarczający."})
+    : route ? (route==="it"?"Prośba trafiła do technika.":"Prośba trafiła do recepcji.")+" Możesz poczekać na odpowiedź lub zamknąć sprawę."
+    : "W tej próbie możesz poprosić o pomoc w jednym miejscu.";
+  return status+`<div class="task-card good"><span class="label">OBECNA INSTRUKCJA</span><b>${html(evidenceWords.server)}</b><p>✓ Karta Oli już jest na liście kart z pozwoleniem na wejście.</p></div><div class="connector" aria-hidden="true"></div>`
+    +button(entered?"confirm-close":"close-server","Zamknij sprawę",{primary:true,hint:entered?"Wybierzesz, co wystarcza Ci do zamknięcia.":"Oznaczysz prośbę Oli jako załatwioną."})
     +`<div class="actions">`
-    +(canInspectReader() ? button("inspect","Sprawdź stan czytnika",{hint:"Sprawdzisz połączenie i odbiór uprawnień · +1 min"}) : "")
-    +(ready&&!route?button("send-it","Przekaż do IT",{hint:knowTimes?"Podjęcie naprawy po 16 min":"Wyślesz zgłoszenie naprawy czytnika"}):"")
-    +(ready&&!route&&receptionOpen&&game.read.has("archive")?button("send-reception","Poproś recepcję",{hint:knowTimes?"Sprawdzenie uprawnień i wpuszczenie Oli · 2 min":"Poprosisz o sprawdzenie uprawnień i wpuszczenie Oli"}):"")
-    +(!saw("denial")?button("manual-wait","Czekaj na wiadomość Oli",{hint:"Przejdziesz do wiadomości · czas oczekiwania nieznany"})
-      : game.pending.some(e=>e.at<=T.evaluation)?button("manual-wait","Czekaj na kolejne zdarzenie",{hint:"Zegar przesunie się do następnej odpowiedzi"})
+    +(canInspectReader() ? button("inspect","Sprawdź czytnik przy drzwiach",{hint:"Sprawdzisz, czy czytnik dostał nową listę. Zajmie to minutę w grze."}) : "")
+    +(ready&&!route?button("send-it","Poproś technika z IT",{hint:knowTimes?"Technik zajmie się sprawą po 16 minutach.":"Poprosisz o naprawę czytnika."}):"")
+    +(ready&&!route&&receptionOpen&&game.read.has("archive")?button("send-reception","Poproś recepcję",{hint:knowTimes?"Iga sprawdzi zgodę i wpuści Olę w 2 minuty.":"Poprosisz Igę, żeby sprawdziła zgodę i wpuściła Olę."}):"")
+    +(!saw("denial")?button("manual-wait","Czekaj na wiadomość Oli",{hint:"Zegar przesunie się do chwili, gdy Ola napisze."})
+      : game.pending.some(e=>e.at<=T.evaluation)?button("manual-wait","Czekaj na kolejne zdarzenie",{hint:"Zegar przesunie się do następnej wiadomości."})
       : button("manual-report","Przejdź do oceny o 12:05",{hint:"Raport pokaże wynik Oli i status zgłoszenia"}))
     +`</div><p class="note">${archiveHint?'<button type="button" class="text-btn" data-doc="archive">Otwórz Archiwum sprawy</button>, żeby odkryć inną ścieżkę pomocy.':html(note)}</p>`;
 }
@@ -461,8 +459,8 @@ const builderQuestions = {
     title:"Po czym agent pozna, że sprawa jest załatwiona?",
     next:"Dalej · kiedy zareagować",
     choices:[
-      ["server","Serwer potwierdził zapis","Daje od razu pewność, że zgoda jest zapisana. Otwarcie drzwi zależy jeszcze od czytnika."],
-      ["card","Karta Oli zadziałała","Potwierdza działanie karty przy drzwiach 3B. Jeśli Ola wejdzie z pomocą recepcji, dowód pojawi się dopiero przy osobnej próbie karty.","tool"],
+      ["server",evidenceLabels.server,"Główna lista pokazuje, że Ola ma zgodę. Czytnik przy drzwiach ma swoją kopię listy."],
+      ["card",evidenceLabels.card,"Czytnik daje znać, gdy karta otworzy zamek. Jeśli Ola wejdzie z pomocą recepcji, działanie karty trzeba sprawdzić osobno.","tool"],
       ["entry","Ola jest w sali","Wiadomość Oli lub recepcji potwierdzi wejście. Karta może wtedy wciąż wymagać naprawy.","archive"]
     ]
   },
@@ -470,26 +468,26 @@ const builderQuestions = {
     title:"Kiedy agent ma zacząć szukać pomocy?",
     next:"Dalej · co zrobić",
     choices:[
-      ["denial","Kiedy Ola zgłosi problem","Agent zareaguje na faktyczną odmowę. Czas na pomoc zacznie biec dopiero, gdy Ola spróbuje wejść i napisze."],
-      ["health","Kiedy sprawdzenie wykaże problem z czytnikiem","Odczyt kosztuje minutę i pozwala działać przed próbą wejścia. Sygnałem jest brak potwierdzenia zmiany i ponad pięć minut bez kontaktu.","tool"]
+      ["denial","Kiedy Ola napisze, że karta nie działa","Agent zacznie szukać pomocy po wiadomości o tym, że drzwi się nie otworzyły."],
+      ["health","Kiedy czytnik milczy i może mieć starą listę","Sprawdzenie trwa minutę. Agent może szukać pomocy, zanim Ola przyłoży kartę.","tool"]
     ]
   },
   action:{
-    title:"Co agent ma zrobić, gdy pora działać i brakuje dowodu?",
-    next:"Dalej · przewiduj wynik",
+    title:"Jak agent ma pomóc, jeśli sprawa wciąż jest otwarta?",
+    next:"Dalej · przewidź wynik",
     choices:[
       ["wait","Czekać na wiadomość","Przydaje się, gdy pomoc już jest w drodze. Agent pozostawia sprawę otwartą i sam nikogo nie wzywa."],
-      ["it","Zgłosić problem do IT","Technik może usunąć usterkę czytnika. Zgłoszenie trafi do kolejki."],
-      ["reception","Poprosić recepcję o wpuszczenie Oli","Recepcja może sprawdzić uprawnienia i wpuścić Olę. Karta wciąż wymaga osobnej próby.","archive"]
+      ["it","Poprosić technika z IT","Technik może naprawić czytnik. Prośba trafi do kolejki."],
+      ["reception","Poprosić recepcję o wpuszczenie Oli","Recepcja może sprawdzić zgodę i wpuścić Olę. Działanie karty trzeba sprawdzić osobno.","archive"]
     ]
   }
 };
 const repairChoiceDescriptions = {
-  server:"Komunikat serwera potwierdza zapis uprawnień przypisanych do karty Oli.",
-  card:"Czytnik 3B poda wynik po przyłożeniu karty Oli.",
+  server:"Główna lista pokazuje, czy karta Oli ma zgodę na wejście.",
+  card:"Ola przykłada kartę do czytnika. Sprawdzamy, czy zamek puści.",
   entry:"Wiadomość od Oli lub wpis recepcji potwierdza, że Ola weszła do sali.",
   wait:"Przydaje się, gdy technik już pracuje i wystarczy poczekać na wynik. Samo czekanie zostawia czytnik bez zlecenia naprawy.",
-  it:"Technik przywróci czytnik i poprosi Olę o próbę karty. Zgłoszenie trafi do kolejki.",
+  it:"Technik naprawi czytnik i poprosi Olę, żeby przyłożyła kartę. Prośba trafi do kolejki.",
   reception:"Dyżurna może ręcznie otworzyć drzwi. Naprawę czytnika prowadzi IT."
 };
 function choiceDescription(value, effect) {
@@ -519,12 +517,12 @@ function editorPanel() {
   const preview = `<section class="instruction-preview" aria-labelledby="preview-title"><h4 id="preview-title">Twoje polecenie dla agenta</h4><pre id="preview-prompt">${previewLines(key)}</pre></section>`;
   const queuesTip = !game.read.has("shifts") ? '<div class="source-tip">Czasy reakcji znajdziesz w aktach. <button type="button" class="text-btn" data-doc="shifts">Dyżury i kolejki</button></div>' : "";
   if (key==="forecast") return missionCard()+`<div class="builder">
-    <h3 id="builder-question" tabindex="-1">Przewiduj wynik i sprawdź polecenie</h3>
+    <h3 id="builder-question" tabindex="-1">Jak myślisz, co się wydarzy?</h3>
     ${preview}
     <section class="forecast" aria-label="Przewiduj wynik">
       <p class="note" id="forecast-hint" role="status">${forecastHint()}</p>
-      ${radios("world",game.final?"Czy karta zadziała do 13:00?":"Ola o 12:00",game.final?"Policz czas do próby karty.":"Policz, kiedy Ola mogłaby wejść.",game.final?"Zadziała":"W sali",game.final?"Nie zadziała":"Pod drzwiami")}
-      ${radios("closed",game.final?"Sprawa o 13:00":"Sprawa o 12:05","Sprawdź, czy agent dostanie wybrany w instrukcji dowód.","Zamknięta","Otwarta")}
+      ${radios("world",game.final?"Czy karta otworzy drzwi do 13:00?":"Czy Ola zdąży wejść przed 12:00?",game.final?"Weź pod uwagę, ile czasu zajmie pomoc i próba karty.":"Weź pod uwagę, o której pomoc może dotrzeć.",game.final?"Otworzy":"Zdąży",game.final?"Nie otworzy":"Nie zdąży")}
+      ${radios("closed",game.final?"Czy agent zamknie sprawę do 13:00?":"Czy agent zamknie sprawę do 12:05?","Sprawdź, czego agent ma szukać w przygotowanej przez Ciebie instrukcji.","Zamknie","Zostawi otwartą")}
     </section>
     ${queuesTip}
     <div class="builder-nav">${back}${button("run","Uruchom agenta",{primary:true,disabled:game.forecast.world===null || game.forecast.closed===null})}</div>
@@ -533,7 +531,7 @@ function editorPanel() {
   const isAvailable = ([value,,,doc]) => !doc || game.read.has(doc) || (value==="health" && game.knowsReaderCheck);
   const choices = question.choices.filter(isAvailable);
   const unread = [...new Set(question.choices.filter(choice=>!isAvailable(choice)).map(choice=>choice[3]))];
-  const orderNote = key==="evidence" ? '<p class="note">Agent najpierw szuka wybranego dowodu. Jeśli go znajdzie, zamknie sprawę.</p>' : "";
+  const orderNote = key==="evidence" ? '<p class="note">Agent najpierw sprawdzi, czy ma wybrane potwierdzenie. Jeśli je znajdzie, zamknie sprawę.</p>' : "";
   return missionCard()+`<div class="builder">
     <p class="builder-count">Krok ${game.editorStep+1} z ${steps.length-1}</p>
     <h3 id="builder-question" tabindex="-1">${html(question.title)}</h3>
@@ -551,14 +549,14 @@ function manualComparison(r) {
   const describe = run => {
     const request = run.events.find(event=>event.kind==="sendIt" || event.kind==="sendReception");
     const helped = request ? `Prośba do ${request.kind==="sendIt"?"IT":"recepcji"} o ${time(request.at)}.` : "Bez wysłanej prośby o pomoc.";
-    const closed = run.closed ? `Zamknięcie o ${time(run.closedAt)}. Dowód: ${inlineEvidenceLabel(run.basis)}.` : "Sprawa otwarta przy ocenie.";
+    const closed = run.closed ? `Sprawa zamknięta o ${time(run.closedAt)}. ${evidenceLabels[run.basis]}.` : "Sprawa wciąż otwarta na koniec próby.";
     return `${helped} ${closed}`;
   };
   return `<details open><summary>Twój ruch i ruch agenta</summary><p class="note"><b>Ręcznie.</b> ${html(describe(manual))}</p><p class="note"><b>Według instrukcji.</b> ${html(describe(r))}</p></details>`;
 }
 function manualRecapLine(event, r) {
   switch (event.kind) {
-    case "read": return "Sprawdziłeś czytnik. Ostatni kontakt o 11:41. Czytnik nie potwierdził odbioru uprawnień.";
+    case "read": return "Sprawdziłeś czytnik przy drzwiach. Ostatnio odezwał się o 11:41. Wciąż czekasz na wiadomość, że dostał nową listę.";
     case "sendReception": return "Poprosiłeś recepcję, żeby wpuściła Olę.";
     case "sendIt": {
       const start = routeEvents("it",event.at).find(step=>step.kind==="itStarted");
@@ -567,7 +565,7 @@ function manualRecapLine(event, r) {
     case "manualWait": return "Wybrałeś czekanie na kolejną wiadomość.";
     case "close": return r.basis==="entry"
       ? "Zamknąłeś zgłoszenie po potwierdzeniu wejścia Oli."
-      : "Zamknąłeś zgłoszenie po potwierdzeniu zapisu na serwerze.";
+      : "Karta Oli była na głównej liście i to wystarczyło Ci do zamknięcia sprawy.";
     case "entry": return r.closed&&r.closedAt<event.at
       ? "Prośba dotarła do recepcji mimo zamknięcia zgłoszenia. Iga wpuściła Olę."
       : "Iga wpuściła Olę w odpowiedzi na Twoją prośbę.";
@@ -595,17 +593,17 @@ function manualReportPanel(r) {
     <div class="manual-result" data-success="${r.world}"><div><h3>${title}</h3><p>${outcome}</p></div><div class="manual-ticket">Zgłoszenie<b>${ticket} · ${r.closed?"10 z 10":"9 z 10"} w systemie</b>${dayRegisterNote}</div></div>
     <div class="recap">
       <section><h3>Twoje decyzje i ich skutki</h3>${trace?`<ol>${trace}</ol>`:"<p>Przeszedłeś do oceny bez wysłania prośby o pomoc.</p>"}${message}</section>
-      <section><h3>Co zrobiłby agent z obecną instrukcją?</h3><p>Zamknąłby zgłoszenie o ${time(baseline.closedAt)}, gdy serwer potwierdził zapis. Na tym instrukcja każe mu skończyć. Nie wysłałby prośby o pomoc i Ola zostałaby pod drzwiami.</p>
+      <section><h3>Co zrobiłby agent z obecną instrukcją?</h3><p>O ${time(baseline.closedAt)} karta Oli była już na głównej liście. Agent uznałby wtedy sprawę za załatwioną i skończył pracę. Ola zostałaby pod drzwiami, bez pomocy.</p>
       <details><summary>Co zmieniłaby inna decyzja?</summary><p>${alternateText}</p>${archiveLink}</details></section>
     </div>
-    <section class="agent-handoff"><h3>Po co pisać instrukcję?</h3><p>Agent zacznie tę samą sprawę od 11:56 i sam podejmie decyzje. Ustalisz, po czym ma poznać, że Ola weszła, kiedy zareagować i kogo poprosić o pomoc. Potem sprawdzisz, czy z Twoją instrukcją pomoże jej wejść na czas.</p>
+    <section class="agent-handoff"><h3>Teraz agent przejmie Twój ruch</h3><p>Agent to program, który wykona wybrane przez Ciebie polecenia. Sprawdź, czy z Twoją instrukcją pomoże Oli wejść na czas.</p>
     <div class="actions">${button("edit","Ułóż instrukcję i przetestuj agenta",{primary:true})}${button("retry-manual","Spróbuj jeszcze raz sam")}</div></section>
   </div>`;
 }
 function managerResponse(r, late, retry) {
   if (r.final) {
     if (r.perfect) return "Karta działa. Mamy potwierdzenie jej użycia. Próba zaliczona.";
-    if (r.closed) return "Zlecenie jest zamknięte. Karta nadal jest odrzucana.";
+    if (r.closed) return "Zlecenie jest zamknięte. Karta Oli nadal nie otwiera drzwi.";
     return "Zlecenie jest otwarte. Sprawdź, czy wybrane działanie doprowadziło do naprawy czytnika i próby karty.";
   }
   if (late) return "Pomoc dotarła o 12:01. Ola potrzebowała jej dwie minuty wcześniej, żeby wejść przed spotkaniem.";
@@ -622,7 +620,7 @@ function reportPanel() {
   const late = !r.final && at!==null && !r.world;
   const score = r.forecast ? Number(r.forecast.world===r.world)+Number(r.forecast.closed===r.closed) : null;
   const worldText = r.final
-    ? r.world?`Karta zaakceptowana o ${time(at)}.`:"Karta nadal odrzucana."
+    ? r.world?`Karta Oli otworzyła drzwi o ${time(at)}.`:"Karta Oli nadal nie otwiera drzwi."
     : at===null?"Ola została pod drzwiami.":r.world?`Ola weszła przed spotkaniem o ${time(at)}.`:`Ola weszła po rozpoczęciu, o ${time(at)}.`;
   const statusText = r.closed?`Zamknięta o ${time(r.closedAt)}.`:"Otwarta przy ocenie.";
   const finishLabel = r.final ? "KARTA OLI" : "CEL OLI";
@@ -632,8 +630,8 @@ function reportPanel() {
   const sent = r.events.find(event=>event.kind==="sendIt" || event.kind==="sendReception");
   let guidance = "";
   if (!r.world && !late && r.closed) {
-    const evidenceUsed = r.basis==="entry" ? "wiadomość „Jestem w sali” z 11:59" : "zapis uprawnień z 11:56";
-    guidance = `<p class="note">Agent użył jako dowodu ${evidenceUsed}. O ${time(r.closedAt)} zamknął sprawę i zakończył pracę przed uruchomieniem pomocy.</p>`;
+    const evidenceUsed = r.basis==="entry" ? "Wystarczyła mu wiadomość „Jestem w sali” z 11:59." : "Wystarczyło mu, że o 11:56 karta Oli była już na głównej liście.";
+    guidance = `<p class="note">O ${time(r.closedAt)} agent zamknął sprawę. ${evidenceUsed} Skończył pracę, zanim poprosił o pomoc.</p>`;
   }
   else if (r.world && !r.closed && retry) guidance = `<p class="note">Potwierdzenia od Oli i recepcji dotarły. O ${time(retry.at)} agent wysłał kolejną prośbę.${game.read.has("record")?"":" Źródło do odczytania: rejestr recepcji."}</p>`;
   else if (!r.closed && sent?.kind==="sendIt" && !r.final) guidance = `<p class="note">IT podejmie sprawę o ${time(sent.at+16)}. Spotkanie rusza o 12:00.</p>`;
@@ -650,9 +648,9 @@ function reportPanel() {
 }
 function renderWork(focus=false) {
   const texts = {
-    manual:["Twój ruch","Cel i warunek zamknięcia"],
+    manual:["Twój ruch","Wybierz, co zrobić, zanim zacznie się spotkanie."],
     editor:["Ułóż polecenie dla agenta","Każda odpowiedź zmienia jedno zdanie polecenia."],
-    playing:["Agent pracuje","Źródła i odpowiedzi pojawiają się na osi czasu."],
+    playing:["Agent pracuje","W dzienniku zobaczysz, co się dzieje."],
     report:game.report&&!game.report.config?["Wynik Twojej próby",""]:["Ocena kierownika","Porównaj wynik Oli ze stanem zgłoszenia."]
   };
   $("work-title").textContent = texts[game.phase][0];
@@ -673,7 +671,7 @@ function render(options={}) {
   $("score-label").textContent = game.final?"ZLECENIE":"ZGŁOSZENIA ZAMKNIĘTE DZIŚ";
   $("score-metric").hidden = game.phase!=="report" || manualReport;
   $("score").textContent = game.final ? (saw("close")?"Zamknięta":"Otwarta") : saw("close")?"10 / 10":"9 / 10";
-  $("mission-title").textContent = game.final?"Przywróć działanie karty Oli":"Wejście do sali 3B";
+  $("mission-title").textContent = game.final?"Przywróć działanie karty Oli":"Pomóż Oli wejść do sali 3B";
   $("deadline").textContent = game.final?"OCENA 13:00":"SPOTKANIE 12:00";
   $("briefing").hidden = game.phase!=="manual" || game.clock>T.start || saw("close");
   renderSide();
@@ -816,7 +814,7 @@ function handleChange(event) {
     const denied = input.value==="old";
     const result = $("door-example-result");
     result.dataset.denied = denied;
-    result.textContent = denied?"Karta odrzucona. Zamek zostaje zamknięty, choć serwer zapisał zgodę.":"Karta przyjęta. Zamek się zwalnia.";
+    result.textContent = denied?"Czytnik szuka karty na starej liście. Nie znajduje jej i drzwi zostają zamknięte.":"Czytnik znajduje kartę na liście. Drzwi można otworzyć.";
     return;
   }
   if (game.phase!=="editor") return;
