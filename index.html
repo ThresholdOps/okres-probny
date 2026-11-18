@@ -88,6 +88,7 @@ legend{padding:0 4px;color:var(--mint);font-size:12px;font-weight:700}.radios{di
 .log-row{display:grid;grid-template-columns:48px minmax(0,1fr);gap:8px;padding:9px 7px;border-bottom:1px solid #273c39;font-size:13px;line-height:1.38}
 .log-row time{font:700 12px/1.45 var(--mono);color:var(--mint)}.log-row b{display:block;margin-bottom:2px;font-weight:650}
 .log-row[data-tone=warn] time{color:var(--amber)}.log-row[data-tone=bad] time{color:var(--coral)}.log-row:last-child{background:#1b2b24;border-radius:4px}
+.briefing:not([hidden]) + .desk .log-row[data-kind="task"]{display:none}
 .report-metrics{display:grid;gap:6px;margin:8px 0}.report-metrics div{padding:7px 8px;background:#152221;border:1px solid var(--line);border-radius:6px}
 .report-metrics b{display:block;font-size:13px}.report-metrics span{font-size:12px;color:var(--muted)}
 .report-status{display:flex;justify-content:space-between;gap:8px;align-items:center}
@@ -260,14 +261,11 @@ function resultOf(events, final, basis, config=null, forecast=null) {
   return {events,final,basis,config,forecast,closedAt,worldAt,world,closed:closedAt!==null,
     perfect:world && closedAt!==null && basis===(final?"card":"entry")};
 }
-function evidenceAvailableAtStart(final, basis) {
-  return basis==="server" || (final && basis==="entry");
-}
 function simulate(final, config, forecast=null) {
   const events = openingEvents(final);
   const stop = final ? T.repairEvaluation : T.evaluation;
   const basis = config.evidence;
-  if (evidenceAvailableAtStart(final,basis)) {
+  if (basis==="server" || (final && basis==="entry")) {
     events.push(closeEvent(final?T.repairStart:T.start,basis));
     if (!final) events.push(denialEvent());
     events.push(item(stop,"eval","Kierownik","Koniec przebiegu. Reguła pomocy nie została użyta."));
@@ -408,7 +406,7 @@ function renderLog() {
   }
   const added = game.log.slice(loggedEvents.length);
   if (!added.length) return;
-  log.insertAdjacentHTML("beforeend",added.map(event=>`<div class="log-row" data-tone="${event.tone}"><time>${time(event.at)}</time><div><b>${html(event.source)}</b><p>${html(event.message)}</p></div></div>`).join(""));
+  log.insertAdjacentHTML("beforeend",added.map(event=>`<div class="log-row" data-kind="${event.kind}" data-tone="${event.tone}"><time>${time(event.at)}</time><div><b>${html(event.source)}</b><p>${html(event.message)}</p></div></div>`).join(""));
   loggedEvents.push(...added);
   log.scrollTop = log.scrollHeight;
 }
@@ -481,19 +479,26 @@ const builderQuestions = {
     next:"Dalej · przewiduj wynik",
     choices:[
       ["wait","Czekać na wiadomość","Przydaje się, gdy pomoc już jest w drodze. Agent pozostawia sprawę otwartą i sam nikogo nie wzywa."],
-      ["it","Zgłosić problem do IT","Technik może usunąć usterkę czytnika. Podejmie zgłoszenie po 16 minutach."],
-      ["reception","Poprosić recepcję o wpuszczenie Oli","Recepcja może sprawdzić uprawnienia i wpuścić Olę w 2 minuty. Karta wciąż wymaga osobnej próby.","archive"]
+      ["it","Zgłosić problem do IT","Technik może usunąć usterkę czytnika. Zgłoszenie trafi do kolejki."],
+      ["reception","Poprosić recepcję o wpuszczenie Oli","Recepcja może sprawdzić uprawnienia i wpuścić Olę. Karta wciąż wymaga osobnej próby.","archive"]
     ]
   }
 };
 const repairChoiceDescriptions = {
-  server:"Zapis już jest w aktach i pozwala od razu zamknąć zlecenie. Dotyczy uprawnień sprzed spotkania. Po naprawie potrzebna jest próba karty.",
-  card:"Udana próba przy drzwiach 3B sprawdza dokładnie to, co ma działać. Agent musi poczekać, aż Ola przetestuje kartę.",
-  entry:"Starsza wiadomość potwierdza, że Ola dotarła na spotkanie. Agent może użyć jej od razu. Po naprawie potrzebny jest nowy dowód działania karty.",
+  server:"Komunikat serwera potwierdza zapis uprawnień przypisanych do karty Oli.",
+  card:"Czytnik 3B poda wynik po przyłożeniu karty Oli.",
+  entry:"Wiadomość od Oli lub wpis recepcji potwierdza, że Ola weszła do sali.",
   wait:"Przydaje się, gdy technik już pracuje i wystarczy poczekać na wynik. Samo czekanie zostawia czytnik bez zlecenia naprawy.",
-  it:"Technik przywróci czytnik i poprosi Olę o próbę karty. Kolejka, naprawa i test zajmą łącznie 23 minuty.",
-  reception:"Dyżurna może otworzyć drzwi w 2 minuty. To zapewnia wejście. Naprawę czytnika prowadzi IT."
+  it:"Technik przywróci czytnik i poprosi Olę o próbę karty. Zgłoszenie trafi do kolejki.",
+  reception:"Dyżurna może ręcznie otworzyć drzwi. Naprawę czytnika prowadzi IT."
 };
+function choiceDescription(value, effect) {
+  const description = game.final ? repairChoiceDescriptions[value] : effect;
+  if (!game.read.has("shifts")) return description;
+  if (value==="it") return description + (game.final ? " Czas do wyniku próby to 23 minuty." : " Technik podejmie zgłoszenie po 16 minutach.");
+  if (value==="reception") return description + " Recepcja potrzebuje 2 minut.";
+  return description;
+}
 function builderSteps() {
   return game.final?["evidence","action","forecast"]:["evidence","trigger","action","forecast"];
 }
@@ -512,6 +517,7 @@ function editorPanel() {
   const key = steps[game.editorStep];
   const back = game.editorStep>0 ? button("builder-back","Wstecz") : "";
   const preview = `<section class="instruction-preview" aria-labelledby="preview-title"><h4 id="preview-title">Twoje polecenie dla agenta</h4><pre id="preview-prompt">${previewLines(key)}</pre></section>`;
+  const queuesTip = !game.read.has("shifts") ? '<div class="source-tip">Czasy reakcji znajdziesz w aktach. <button type="button" class="text-btn" data-doc="shifts">Dyżury i kolejki</button></div>' : "";
   if (key==="forecast") return missionCard()+`<div class="builder">
     <h3 id="builder-question" tabindex="-1">Przewiduj wynik i sprawdź polecenie</h3>
     ${preview}
@@ -520,20 +526,21 @@ function editorPanel() {
       ${radios("world",game.final?"Czy karta zadziała do 13:00?":"Ola o 12:00",game.final?"Policz czas do próby karty.":"Policz, kiedy Ola mogłaby wejść.",game.final?"Zadziała":"W sali",game.final?"Nie zadziała":"Pod drzwiami")}
       ${radios("closed",game.final?"Sprawa o 13:00":"Sprawa o 12:05","Sprawdź, czy agent dostanie wybrany w instrukcji dowód.","Zamknięta","Otwarta")}
     </section>
+    ${queuesTip}
     <div class="builder-nav">${back}${button("run","Uruchom agenta",{primary:true,disabled:game.forecast.world===null || game.forecast.closed===null})}</div>
   </div>`;
   const question = builderQuestions[key];
   const isAvailable = ([value,,,doc]) => !doc || game.read.has(doc) || (value==="health" && game.knowsReaderCheck);
   const choices = question.choices.filter(isAvailable);
   const unread = [...new Set(question.choices.filter(choice=>!isAvailable(choice)).map(choice=>choice[3]))];
-  const orderNote = key==="evidence" ? '<p class="note">Agent najpierw szuka wybranego dowodu. Jeśli go znajdzie, zamknie sprawę.</p>'
-    : evidenceAvailableAtStart(game.final,game.config.evidence) ? '<p class="note warn-text">Wybrany dowód już jest w aktach. Przy tej instrukcji agent zamknie sprawę przed uruchomieniem pomocy.</p>' : "";
+  const orderNote = key==="evidence" ? '<p class="note">Agent najpierw szuka wybranego dowodu. Jeśli go znajdzie, zamknie sprawę.</p>' : "";
   return missionCard()+`<div class="builder">
     <p class="builder-count">Krok ${game.editorStep+1} z ${steps.length-1}</p>
     <h3 id="builder-question" tabindex="-1">${html(question.title)}</h3>
     ${orderNote}
-    <fieldset class="builder-options" aria-labelledby="builder-question">${choices.map(([value,label,effect])=>`<label class="builder-choice"><input type="radio" name="${key}" value="${value}" data-config="${key}"${game.config[key]===value?" checked":""}><span><b>${html(label)}</b><small>${html(game.final?repairChoiceDescriptions[value]:effect)}</small></span></label>`).join("")}</fieldset>
+    <fieldset class="builder-options" aria-labelledby="builder-question">${choices.map(([value,label,effect])=>`<label class="builder-choice"><input type="radio" name="${key}" value="${value}" data-config="${key}"${game.config[key]===value?" checked":""}><span><b>${html(label)}</b><small>${html(choiceDescription(value,effect))}</small></span></label>`).join("")}</fieldset>
     ${unread.length?`<div class="source-tip">Otwórz akta, żeby odkryć kolejne odpowiedzi.${unread.map(doc=>` <button type="button" class="text-btn" data-doc="${doc}">${html(sourceNames[doc])}</button>`).join("")}</div>`:""}
+    ${key==="action"?queuesTip:""}
     ${preview}
     <div class="builder-nav">${back}${button("builder-next",game.final&&key==="evidence"?builderQuestions.trigger.next:question.next,{primary:true})}</div>
   </div>`;
@@ -624,7 +631,10 @@ function reportPanel() {
   const message = !r.final && r.closed && at===null ? olaMessage(r.events.find(event=>event.kind==="denial")) : "";
   const sent = r.events.find(event=>event.kind==="sendIt" || event.kind==="sendReception");
   let guidance = "";
-  if (!r.world && !late && r.closed) guidance = `<p class="note">${html(evidenceWords[r.basis])} ${!sent?"Reguła pomocy nie została użyta.":""}</p>`;
+  if (!r.world && !late && r.closed) {
+    const evidenceUsed = r.basis==="entry" ? "wiadomość „Jestem w sali” z 11:59" : "zapis uprawnień z 11:56";
+    guidance = `<p class="note">Agent użył jako dowodu ${evidenceUsed}. O ${time(r.closedAt)} zamknął sprawę i zakończył pracę przed uruchomieniem pomocy.</p>`;
+  }
   else if (r.world && !r.closed && retry) guidance = `<p class="note">Potwierdzenia od Oli i recepcji dotarły. O ${time(retry.at)} agent wysłał kolejną prośbę.${game.read.has("record")?"":" Źródło do odczytania: rejestr recepcji."}</p>`;
   else if (!r.closed && sent?.kind==="sendIt" && !r.final) guidance = `<p class="note">IT podejmie sprawę o ${time(sent.at+16)}. Spotkanie rusza o 12:00.</p>`;
   const forecastLabel = score===null?"":`<p class="note">Trafne przewidywania <strong>${score} z 2</strong>. ${r.forecast.world===r.world?"Wynik zgodny.":"Wynik był inny."} ${r.forecast.closed===r.closed?"Stan sprawy zgodny.":"Stan sprawy był inny."}</p>`;
