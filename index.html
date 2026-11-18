@@ -58,8 +58,6 @@ h1{font-size:clamp(31px,5vw,48px);line-height:1;letter-spacing:-.056em}
 .task-card.good{border-color:#6d9249;background:#202c1c}.task-card.good p,.task-card.good .label{color:var(--lime)}
 .task-card.warn{border-color:#755638;background:#282119}.task-card.warn p{color:var(--amber)}
 .label{display:block;color:var(--muted);font:700 10px var(--mono);letter-spacing:.035em}
-.connector{width:1px;height:13px;margin:-8px auto 3px;background:var(--lime)}
-.connector::after{display:block;margin-left:-3px;content:"";position:relative;top:10px;border-top:5px solid var(--lime);border-right:4px solid transparent;border-left:4px solid transparent}
 .actions{display:grid;gap:7px;margin-top:9px}
 .btn{display:flex;justify-content:space-between;align-items:center;gap:9px;min-height:42px;width:100%;text-align:left;font-size:14px;font-weight:760;color:var(--ink);background:#1b2a29;border:1px solid #466861;border-radius:7px;padding:8px 10px}
 .btn:hover:not(:disabled){background:#27423a}.btn.primary{color:#19230e;background:var(--lime);border-color:#d3fa97}.btn.primary:hover:not(:disabled){background:#d3fc91}
@@ -420,7 +418,8 @@ function olaMessage(event) {
 }
 function manualPanel() {
   const route = game.manualRoute;
-  const ready = saw("read") || saw("denial");
+  const checkedReader = saw("read");
+  const ready = checkedReader || saw("denial");
   const entered = saw("entry");
   const status = missionCard()+(entered?"":olaMessage(game.log.find(event=>event.kind==="denial")));
   if (saw("close")) {
@@ -430,8 +429,8 @@ function manualPanel() {
   }
   if (game.confirm) {
     return status+`<p class="note">Co wystarczy Ci, żeby uznać sprawę za załatwioną?</p><div class="actions">`
-      +button("close-server",evidenceLabels.server,{primary:true})
-      +button("close-entry",evidenceLabels.entry,{primary:true})
+      +button("close-server",evidenceLabels.server)
+      +button("close-entry",evidenceLabels.entry)
       +button("cancel-close","Wróć do sprawy")+"</div>";
   }
   const knowTimes = game.read.has("shifts");
@@ -440,8 +439,9 @@ function manualPanel() {
   const note = entered ? "Ola potwierdziła wejście. Przy zamknięciu możesz wskazać jej wiadomość."
     : route ? (route==="it"?"Prośba trafiła do technika.":"Prośba trafiła do recepcji.")+" Możesz poczekać na odpowiedź lub zamknąć sprawę."
     : "W tej próbie możesz poprosić o pomoc w jednym miejscu.";
-  return status+`<div class="task-card good"><span class="label">OBECNA INSTRUKCJA</span><b>${html(evidenceWords.server)}</b><p>✓ Karta Oli już jest na liście kart z pozwoleniem na wejście.</p></div><div class="connector" aria-hidden="true"></div>`
-    +button(entered?"confirm-close":"close-server","Zamknij sprawę",{primary:true,hint:entered?"Wybierzesz, co wystarcza Ci do zamknięcia.":"Oznaczysz prośbę Oli jako załatwioną."})
+  const readerStatus = checkedReader ? "Czytnik nadal nie potwierdził, że dostał nową listę." : "Jeszcze nie wiesz, czy czytnik przy drzwiach dostał nową listę.";
+  const accessStatus = entered?"":`<div class="task-card"><span class="label">CO JUŻ WIESZ</span><b>Karta Oli jest na głównej liście dostępu.</b><p>${readerStatus}</p></div>`;
+  return status+accessStatus
     +`<div class="actions">`
     +(canInspectReader() ? button("inspect","Sprawdź czytnik przy drzwiach",{hint:"Sprawdzisz, czy czytnik dostał nową listę. Zajmie to minutę w grze."}) : "")
     +(ready&&!route?button("send-it","Poproś technika z IT",{hint:knowTimes?"Technik zajmie się sprawą po 16 minutach.":"Poprosisz o naprawę czytnika."}):"")
@@ -449,6 +449,7 @@ function manualPanel() {
     +(!saw("denial")?button("manual-wait","Czekaj na wiadomość Oli",{hint:"Zegar przesunie się do chwili, gdy Ola napisze."})
       : game.pending.some(e=>e.at<=T.evaluation)?button("manual-wait","Czekaj na kolejne zdarzenie",{hint:"Zegar przesunie się do następnej wiadomości."})
       : button("manual-report","Przejdź do oceny o 12:05",{hint:"Raport pokaże wynik Oli i status zgłoszenia"}))
+    +button(entered?"confirm-close":"close-server","Zamknij sprawę",{hint:entered?"Wybierzesz, co wystarcza Ci do zamknięcia.":"Oznaczysz prośbę Oli jako załatwioną."})
     +`</div><p class="note">${archiveHint?'<button type="button" class="text-btn" data-doc="archive">Otwórz Archiwum sprawy</button>, żeby odkryć inną ścieżkę pomocy.':html(note)}</p>`;
 }
 function radios(key,legend,hint,a,b) {
@@ -593,7 +594,7 @@ function manualReportPanel(r) {
     <div class="manual-result" data-success="${r.world}"><div><h3>${title}</h3><p>${outcome}</p></div><div class="manual-ticket">Zgłoszenie<b>${ticket} · ${r.closed?"10 z 10":"9 z 10"} w systemie</b>${dayRegisterNote}</div></div>
     <div class="recap">
       <section><h3>Twoje decyzje i ich skutki</h3>${trace?`<ol>${trace}</ol>`:"<p>Przeszedłeś do oceny bez wysłania prośby o pomoc.</p>"}${message}</section>
-      <section><h3>Co zrobiłby agent z obecną instrukcją?</h3><p>O ${time(baseline.closedAt)} karta Oli była już na głównej liście. Agent uznałby wtedy sprawę za załatwioną i skończył pracę. Ola zostałaby pod drzwiami, bez pomocy.</p>
+      <section><h3>Co zrobiłby agent z obecną instrukcją?</h3><p>Obecna instrukcja każe agentowi zamknąć sprawę, gdy karta Oli jest na głównej liście. O ${time(baseline.closedAt)} karta już tam była. Agent skończyłby pracę, a Ola zostałaby pod drzwiami bez pomocy.</p>
       <details><summary>Co zmieniłaby inna decyzja?</summary><p>${alternateText}</p>${archiveLink}</details></section>
     </div>
     <section class="agent-handoff"><h3>Teraz agent przejmie Twój ruch</h3><p>Agent to program, który wykona wybrane przez Ciebie polecenia. Sprawdź, czy z Twoją instrukcją pomoże Oli wejść na czas.</p>
